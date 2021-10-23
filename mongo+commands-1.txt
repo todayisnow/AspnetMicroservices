@@ -7,7 +7,7 @@ docker run -d -p 27017:27017 --name shopping-mongo  mongo
 
 docker exec -it shopping-mongo /bin/bash
 
-
+show
 2
 -- After that, we are able to run mongo commands. 
 Let me try with 

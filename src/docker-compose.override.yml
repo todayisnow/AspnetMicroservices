@@ -8,6 +8,15 @@ services:
         - "27017:27017"
     volumes:
         - mongo_data:/data/db 
+
+  #mongoclient:
+  #  image: mongoclient/mongoclient:latest
+  #  container_name: mongoclient
+  #  hostname: mongoclient
+  #  depends_on:
+  #    - mongodb
+  #  ports:
+  #    - 3000:3000
             
   catalog.api:
     container_name: catalog.api
