@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
 
@@ -56,7 +57,24 @@ namespace Basket.API
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Basket.API", Version = "v1" });
             });
-
+            services.AddAuthentication("Bearer")
+        .AddJwtBearer("Bearer", options =>
+        {
+            options.Authority = "https://localhost:5007";
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false
+            };
+        });
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("ClientIdPolicy",
+                    (policy) =>
+                    {
+                        policy.RequireClaim("scope", "basketAPI");
+                        policy.RequireClaim("client_id", "testClient");
+                    });
+            });
             //services.AddHealthChecks()
             //        .AddRedis(Configuration["CacheSettings:ConnectionString"], "Redis Health", HealthStatus.Degraded);
         }
@@ -72,6 +90,7 @@ namespace Basket.API
             }
 
             app.UseRouting();
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

@@ -1,6 +1,7 @@
 ﻿using Catalog.API.Entities;
 using Catalog.API.Repositories.Interfaces;
 using DnsClient.Internal;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,6 +13,7 @@ namespace Catalog.API.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
+    [Authorize("ClientIdPolicy")]
     public class CatalogController : ControllerBase
     {
         private readonly IProductRepository _repository;
@@ -87,7 +89,7 @@ namespace Catalog.API.Controllers
             return Ok(await _repository.UpdateProduct(product));
         }
 
-        [HttpDelete("{id:length(24)}", Name = "DeleteProduct")]        
+        [HttpDelete("{id:length(24)}", Name = "DeleteProduct")]
         [ProducesResponseType(typeof(Product), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> DeleteProductById(string id)
         {

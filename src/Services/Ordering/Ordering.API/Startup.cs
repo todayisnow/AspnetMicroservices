@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Ordering.API.EventBusConsumer;
 using Ordering.Application;
@@ -55,7 +56,24 @@ namespace Ordering.API
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Ordering.API", Version = "v1" });
             });
-
+            services.AddAuthentication("Bearer")
+        .AddJwtBearer("Bearer", options =>
+        {
+            options.Authority = "https://localhost:5007";
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false
+            };
+        });
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("ClientIdPolicy",
+                    (policy) =>
+                    {
+                        policy.RequireClaim("scope", "orderAPI");
+                        policy.RequireClaim("client_id", "testClient");
+                    });
+            });
             // services.AddHealthChecks().AddDbContextCheck<OrderContext>();
         }
 
@@ -70,6 +88,7 @@ namespace Ordering.API
             }
 
             app.UseRouting();
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
