@@ -24,18 +24,18 @@ namespace IdentityServer
                    },
                    new Client
                    {
-                       ClientId = "movies_mvc_client",
-                       ClientName = "Movies MVC Web App",
-                       AllowedGrantTypes = GrantTypes.Hybrid,
-                       RequirePkce = false,
+                       ClientId = "AspnetRunBasics_client",
+                       ClientName = "AspnetRun Basics Razor App",
+                       AllowedGrantTypes = GrantTypes.Code,
+                       //RequirePkce = false,
                        AllowRememberConsent = false,
                        RedirectUris = new List<string>()
                        {
-                           "https://localhost:5002/signin-oidc"
+                           "https://localhost:5006/signin-oidc"
                        },
                        PostLogoutRedirectUris = new List<string>()
                        {
-                           "https://localhost:5002/signout-callback-oidc"
+                           "https://localhost:5006/signout-callback-oidc"
                        },
                        ClientSecrets = new List<Secret>
                        {
@@ -47,7 +47,9 @@ namespace IdentityServer
                            IdentityServerConstants.StandardScopes.Profile,
                            IdentityServerConstants.StandardScopes.Address,
                            IdentityServerConstants.StandardScopes.Email,
-                           "movieAPI",
+                           "basketAPI",
+                           "catalogAPI",
+                           "orderAPI",
                            "roles"
                        }
                    }
