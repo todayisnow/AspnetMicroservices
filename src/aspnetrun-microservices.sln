@@ -47,7 +47,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspnetRunBasics", "WebApps\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identity", "Identity", "{BF9E433B-F6B9-42EE-86D0-1106E1225790}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServer", "services\Identity\IdentityServer\IdentityServer.csproj", "{70F7E302-4A7B-436F-AB3A-325032AB4222}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer", "services\Identity\IdentityServer\IdentityServer.csproj", "{70F7E302-4A7B-436F-AB3A-325032AB4222}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

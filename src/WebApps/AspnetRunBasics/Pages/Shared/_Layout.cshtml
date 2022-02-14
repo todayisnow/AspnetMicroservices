@@ -18,6 +18,11 @@
         <nav class="navbar navbar-expand-md navbar-dark bg-dark">
             <div class="container">
                 <a class="navbar-brand" asp-area="" asp-page="/Index">AspnetRunBasics</a>
+                @if (User.Identity.IsAuthenticated)
+                {
+
+                    <a class="navbar-brand" asp-area="" asp-page="Logout">xx - @User.Claims.Last().Value</a>
+                }
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -29,7 +34,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-page="/Product">Product</a>
-                        </li>                        
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-page="/Cart">Cart</a>
                         </li>
@@ -128,46 +133,46 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" type="text/javascript"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" type="text/javascript"></script>
     <script type="text/javascript">
-        //Plus & Minus for Quantity product
-        $(document).ready(function () {
-            var quantity = 1;
+          //Plus & Minus for Quantity product
+          $(document).ready(function () {
+              var quantity = 1;
 
-            $('.quantity-right-plus').click(function (e) {
-                e.preventDefault();
-                var quantity = parseInt($('#quantity').val());
-                $('#quantity').val(quantity + 1);
-            });
+              $('.quantity-right-plus').click(function (e) {
+                  e.preventDefault();
+                  var quantity = parseInt($('#quantity').val());
+                  $('#quantity').val(quantity + 1);
+              });
 
-            $('.quantity-left-minus').click(function (e) {
-                e.preventDefault();
-                var quantity = parseInt($('#quantity').val());
-                if (quantity > 1) {
-                    $('#quantity').val(quantity - 1);
-                }
-            });
+              $('.quantity-left-minus').click(function (e) {
+                  e.preventDefault();
+                  var quantity = parseInt($('#quantity').val());
+                  if (quantity > 1) {
+                      $('#quantity').val(quantity - 1);
+                  }
+              });
 
-        });
-
-      // Example starter JavaScript for disabling form submissions if there are invalid fields
-      (function() {
-        'use strict';
-
-        window.addEventListener('load', function() {
-          // Fetch all the forms we want to apply custom Bootstrap validation styles to
-          var forms = document.getElementsByClassName('needs-validation');
-
-          // Loop over them and prevent submission
-          var validation = Array.prototype.filter.call(forms, function(form) {
-            form.addEventListener('submit', function(event) {
-              if (form.checkValidity() === false) {
-                event.preventDefault();
-                event.stopPropagation();
-              }
-              form.classList.add('was-validated');
-            }, false);
           });
-        }, false);
-        })();
+
+        // Example starter JavaScript for disabling form submissions if there are invalid fields
+        (function() {
+          'use strict';
+
+          window.addEventListener('load', function() {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function(form) {
+              form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+              }, false);
+            });
+          }, false);
+          })();
 
     </script>
 
