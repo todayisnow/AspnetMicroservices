@@ -11,12 +11,13 @@ namespace IdentityServer
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.ConfigureNonBreakingSameSiteCookies();
+
             services.AddControllersWithViews();
-            services.AddIdentityServer(x =>
-            {
-                x.IssuerUri = "https://identityserver";
-            })
+            services.AddIdentityServer()
+                 //x =>
+                 //{
+                 //    x.IssuerUri = "https://identityserver";
+                 //}
                  .AddInMemoryClients(Config.Clients)
                  .AddInMemoryApiScopes(Config.ApiScopes)
                  .AddInMemoryIdentityResources(Config.IdentityResources)
@@ -37,7 +38,7 @@ namespace IdentityServer
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseCookiePolicy();
+
             app.UseStaticFiles();
             app.UseRouting();
             app.UseIdentityServer();

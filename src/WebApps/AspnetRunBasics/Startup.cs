@@ -1,3 +1,4 @@
+using AspnetRunBasics.HttpHandlers;
 using AspnetRunBasics.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -7,8 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Logging;
+using Microsoft.Net.Http.Headers;
 using System;
-using System.Net;
 
 namespace AspnetRunBasics
 {
@@ -26,9 +27,17 @@ namespace AspnetRunBasics
         {
             //services.AddTransient<LoggingDelegatingHandler>();
             IdentityModelEventSource.ShowPII = true;
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+            services.AddTransient<AuthenticationDelegatingHandler>();
+
             services.AddHttpClient<ICatalogService, CatalogService>(c =>
-                c.BaseAddress = new Uri(Configuration["ApiSettings:GatewayAddress"]));
+            {
+                c.BaseAddress = new Uri(Configuration["ApiSettings:GatewayAddress"]);
+                c.DefaultRequestHeaders.Clear();
+                c.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
+
+
+            }).AddHttpMessageHandler<AuthenticationDelegatingHandler>();
             //.AddHttpMessageHandler<LoggingDelegatingHandler>()
             //.AddPolicyHandler(GetRetryPolicy())
             //.AddPolicyHandler(GetCircuitBreakerPolicy());
@@ -44,6 +53,19 @@ namespace AspnetRunBasics
             //.AddHttpMessageHandler<LoggingDelegatingHandler>()
             //.AddPolicyHandler(GetRetryPolicy())
             //.AddPolicyHandler(GetCircuitBreakerPolicy());
+
+
+            services.AddHttpClient("IDPClient", client =>
+            {
+                client.BaseAddress = new Uri(Configuration["IdentityServer:Uri"]);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
+            });
+
+            services.AddHttpContextAccessor();
+
+
+
 
             services.AddRazorPages();
 

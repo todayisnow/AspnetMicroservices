@@ -8,8 +8,6 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
 COPY ["Services/Identity/IdentityServer/IdentityServer.csproj", "Services/Identity/IdentityServer/"]
-COPY ["x/mycert.crt", "/usr/local/share/ca-certificates/"]
-RUN update-ca-certificates
 RUN dotnet restore "Services/Identity/IdentityServer/IdentityServer.csproj"
 COPY . .
 WORKDIR "/src/Services/Identity/IdentityServer"
