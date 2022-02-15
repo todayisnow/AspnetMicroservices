@@ -64,6 +64,12 @@ services:
       context: .
       dockerfile: WebApps/AspnetRunBasics/Dockerfile
 
+  identityserver:
+    image: ${DOCKER_REGISTRY-}identityserver
+    build:
+      context: .
+      dockerfile: services/Identity/IdentityServer/Dockerfile
+
 volumes:
   mongo_data:
   portainer-data:
@@ -71,6 +77,7 @@ volumes:
   pgadmin-data:
   
   
+
 
 
 

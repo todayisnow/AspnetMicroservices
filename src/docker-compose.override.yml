@@ -163,12 +163,49 @@ services:
     environment:
         - ASPNETCORE_ENVIRONMENT=Development
         - "ApiSettings:GatewayAddress=http://ocelotapigw"
-
+        - "IdentityServer:Uri=https://identityserver"
+        - ASPNETCORE_URLS=https://+:443;http://+:80 
+        - ASPNETCORE_HTTPS_PORT=8007 
+        - ASPNETCORE_Kestrel__Certificates__Default__Password=1234 
+        - ASPNETCORE_Kestrel__Certificates__Default__Path=/root/.aspnet/https/aspnetapp.pfx
     depends_on:
         - ocelotapigw
         - catalog.api
         - basket.api
         - discount.api
         - ordering.api
+        - identityserver
     ports:
         - "8006:80"
+        - "8009:443"
+    volumes:
+      - ${USERPROFILE}\.aspnet\https:/root/.aspnet/https
+    
+
+  identityserver:
+    container_name: identityserver
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80 
+      - ASPNETCORE_HTTPS_PORT=8007 
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=1234 
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/root/.aspnet/https/aspnetapp.pfx
+    ports:
+      - "8008:80"
+      - "8007:443"
+    volumes:
+      - ${USERPROFILE}\.aspnet\https:/root/.aspnet/https
+
+
+##create a SAN cert for both host.docker.internal and localhost
+#$cert = New-SelfSignedCertificate -DnsName "host.docker.internal", "localhost" -CertStoreLocation cert:\localmachine\my
+
+##export it for docker container to pick up later
+#$password = ConvertTo-SecureString -String "1234" -Force -AsPlainText
+#Export-PfxCertificate -Cert $cert -FilePath $env:USERPROFILE\.aspnet\https\aspnetappqsdqwe.pfx -Password $password
+
+## trust it on your host machine
+#$store = New-Object System.Security.Cryptography.X509Certificates.X509Store "TrustedPublisher","LocalMachine"
+#$store.Open("ReadWrite")
+#$store.Add($cert)
+#$store.Close()

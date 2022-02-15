@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Logging;
 using System;
+using System.Net;
 
 namespace AspnetRunBasics
 {
@@ -23,7 +25,8 @@ namespace AspnetRunBasics
         public void ConfigureServices(IServiceCollection services)
         {
             //services.AddTransient<LoggingDelegatingHandler>();
-
+            IdentityModelEventSource.ShowPII = true;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             services.AddHttpClient<ICatalogService, CatalogService>(c =>
                 c.BaseAddress = new Uri(Configuration["ApiSettings:GatewayAddress"]));
             //.AddHttpMessageHandler<LoggingDelegatingHandler>()
@@ -52,7 +55,7 @@ namespace AspnetRunBasics
                     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
                     .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
                     {
-                        options.Authority = "https://localhost:5007";
+                        options.Authority = Configuration["IdentityServer:Uri"];
 
                         options.ClientId = "aspnetRunBasics_client";
                         options.ClientSecret = "secret";
