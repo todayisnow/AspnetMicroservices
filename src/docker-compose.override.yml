@@ -164,22 +164,18 @@ services:
         - ASPNETCORE_ENVIRONMENT=Development
         - "ApiSettings:GatewayAddress=http://ocelotapigw"
         - "IdentityServer:Uri=https://identityserver"
-        - ASPNETCORE_URLS=https://+:443;http://+:80 
-        - ASPNETCORE_HTTPS_PORT=8007 
-        - ASPNETCORE_Kestrel__Certificates__Default__Password=1234 
-        - ASPNETCORE_Kestrel__Certificates__Default__Path=/root/.aspnet/https/aspnetapp.pfx
+        
     depends_on:
         - ocelotapigw
         - catalog.api
         - basket.api
         - discount.api
         - ordering.api
-        - identityserver
+       
     ports:
         - "8006:80"
-        - "8009:443"
-    volumes:
-      - ${USERPROFILE}\.aspnet\https:/root/.aspnet/https
+        
+   
     
 
   #identityserver:
