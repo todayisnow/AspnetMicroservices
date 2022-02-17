@@ -26,16 +26,16 @@ namespace IdentityServer
                    {
                        ClientId = "aspnetRunBasics_client",
                        ClientName = "AspnetRun Basics Razor App",
-                       AllowedGrantTypes = GrantTypes.Code,
-                       //RequirePkce = false,
+                       AllowedGrantTypes = GrantTypes.Hybrid,
+                       RequirePkce = false,
                        AllowRememberConsent = false,
                        RedirectUris = new List<string>()
                        {
-                           "http://localhost:5006/signin-oidc"
+                           "https://localhost:5006/signin-oidc"
                        },
                        PostLogoutRedirectUris = new List<string>()
                        {
-                           "http://localhost:5006/signout-callback-oidc"
+                           "https://localhost:5006/signout-callback-oidc"
                        },
                        ClientSecrets = new List<Secret>
                        {
@@ -47,9 +47,9 @@ namespace IdentityServer
                            IdentityServerConstants.StandardScopes.Profile,
                            //IdentityServerConstants.StandardScopes.Address,
                            //IdentityServerConstants.StandardScopes.Email,
-                           //"basketAPI",
-                           //"catalogAPI",
-                           //"orderAPI",
+                           "basketAPI",
+                           "catalogAPI",
+                           "orderAPI",
                            //"roles"
                        }
                    }

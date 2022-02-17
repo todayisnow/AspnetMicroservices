@@ -72,7 +72,7 @@ namespace Basket.API
                     (policy) =>
                     {
                         policy.RequireClaim("scope", "basketAPI");
-                        policy.RequireClaim("client_id", "testClient");
+                        policy.RequireClaim("client_id", "testClient", "aspnetRunBasics_client");
                     });
             });
             //services.AddHealthChecks()

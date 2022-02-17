@@ -48,7 +48,7 @@ namespace Catalog.API
                     (policy) =>
                     {
                         policy.RequireClaim("scope", "catalogAPI");
-                        policy.RequireClaim("client_id", "testClient");
+                        policy.RequireClaim("client_id", "testClient", "aspnetRunBasics_client");
                     });
             });
 

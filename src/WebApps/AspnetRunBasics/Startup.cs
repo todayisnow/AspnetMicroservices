@@ -55,13 +55,19 @@ namespace AspnetRunBasics
             //.AddPolicyHandler(GetCircuitBreakerPolicy());
 
 
-            services.AddHttpClient("IDPClient", client =>
-            {
-                client.BaseAddress = new Uri(Configuration["IdentityServer:Uri"]);
-                client.DefaultRequestHeaders.Clear();
-                client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
-            });
-
+            //services.AddHttpClient("IDPClient", client =>
+            //{
+            //    client.BaseAddress = new Uri(Configuration["IdentityServer:Uri"]);
+            //    client.DefaultRequestHeaders.Clear();
+            //    client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
+            //});
+            //services.AddSingleton(new ClientCredentialsTokenRequest
+            //{                                                
+            //    Address = "https://localhost:5005/connect/token",
+            //    ClientId = "movieClient",
+            //    ClientSecret = "secret",
+            //    Scope = "movieAPI"
+            //});
             services.AddHttpContextAccessor();
 
 
@@ -81,7 +87,7 @@ namespace AspnetRunBasics
 
                         options.ClientId = "aspnetRunBasics_client";
                         options.ClientSecret = "secret";
-                        options.ResponseType = "code";
+                        options.ResponseType = "code id_token";
 
                         options.Scope.Add("openid");
                         options.Scope.Add("profile");
@@ -95,7 +101,11 @@ namespace AspnetRunBasics
                         //options.ClaimActions.DeleteClaim("auth_time");
                         //options.ClaimActions.MapUniqueJsonKey("role", "role");
 
-                        //options.Scope.Add("movieAPI");
+                        options.Scope.Add("catalogAPI");
+                        options.Scope.Add("orderAPI");
+
+                        options.Scope.Add("basketAPI");
+
 
                         options.SaveTokens = true;
                         options.GetClaimsFromUserInfoEndpoint = true;
