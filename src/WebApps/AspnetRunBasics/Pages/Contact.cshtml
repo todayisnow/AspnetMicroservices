@@ -4,6 +4,35 @@
     ViewData["Title"] = "Contact";
 }
 
+
+<h1>OnlyAdmin</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Claim Type
+            </th>
+            <th>
+                Claim Value
+            </th>            
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.xm.userInfoDictionary)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Key)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Value)
+                </td>                            
+            </tr>
+        }
+    </tbody>
+</table>
+<hr />
 <section class="jumbotron text-center">
     <div class="container">
         <h1 class="jumbotron-heading">E-COMMERCE CONTACT</h1>

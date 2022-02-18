@@ -1,5 +1,7 @@
 using AspnetRunBasics.HttpHandlers;
 using AspnetRunBasics.Services;
+using IdentityModel;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
@@ -8,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using System;
 
@@ -25,6 +28,7 @@ namespace AspnetRunBasics
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
             //services.AddTransient<LoggingDelegatingHandler>();
             IdentityModelEventSource.ShowPII = true;
 
@@ -55,12 +59,12 @@ namespace AspnetRunBasics
             //.AddPolicyHandler(GetCircuitBreakerPolicy());
 
 
-            //services.AddHttpClient("IDPClient", client =>
-            //{
-            //    client.BaseAddress = new Uri(Configuration["IdentityServer:Uri"]);
-            //    client.DefaultRequestHeaders.Clear();
-            //    client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
-            //});
+            services.AddHttpClient("IDPClient", client =>
+            {
+                client.BaseAddress = new Uri(Configuration["IdentityServer:Uri"]);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
+            });
             //services.AddSingleton(new ClientCredentialsTokenRequest
             //{                                                
             //    Address = "https://localhost:5005/connect/token",
@@ -71,16 +75,24 @@ namespace AspnetRunBasics
             services.AddHttpContextAccessor();
 
 
+            services.AddTransient<TokenFilterAttribute>();
 
-
-            services.AddRazorPages();
+            services.AddRazorPages().AddMvcOptions(options =>
+            {
+                options.Filters.Add(new TokenFilterAttribute());
+            });
 
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
             })
-                    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
+
+                    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+                    {
+
+                        options.AccessDeniedPath = "/Account/denied";
+                    })
                     .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
                     {
                         options.Authority = Configuration["IdentityServer:Uri"];
@@ -89,17 +101,19 @@ namespace AspnetRunBasics
                         options.ClientSecret = "secret";
                         options.ResponseType = "code id_token";
 
-                        options.Scope.Add("openid");
-                        options.Scope.Add("profile");
-                        //options.Scope.Add("address");
-                        //options.Scope.Add("email");
-                        //options.Scope.Add("roles");
+                        //options.Scope.Add("openid"); come automatically
+                        // options.Scope.Add("profile");
+                        options.Scope.Add("address");
+                        options.Scope.Add("email");
+                        options.Scope.Add("roles");
+
+                        options.Scope.Add("offline_access");
 
                         //options.ClaimActions.DeleteClaim("sid");
                         //options.ClaimActions.DeleteClaim("idp");
                         //options.ClaimActions.DeleteClaim("s_hash");
                         //options.ClaimActions.DeleteClaim("auth_time");
-                        //options.ClaimActions.MapUniqueJsonKey("role", "role");
+                        options.ClaimActions.MapJsonKey("role", "role", "role");
 
                         options.Scope.Add("catalogAPI");
                         options.Scope.Add("orderAPI");
@@ -110,11 +124,12 @@ namespace AspnetRunBasics
                         options.SaveTokens = true;
                         options.GetClaimsFromUserInfoEndpoint = true;
 
-                        //options.TokenValidationParameters = new TokenValidationParameters
-                        //{
-                        //    NameClaimType = JwtClaimTypes.GivenName,
-                        //    RoleClaimType = JwtClaimTypes.Role
-                        //};
+
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            NameClaimType = JwtClaimTypes.GivenName,
+                            RoleClaimType = JwtClaimTypes.Role
+                        };
                     });
 
 
@@ -146,6 +161,7 @@ namespace AspnetRunBasics
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+
                 //endpoints.MapHealthChecks("/hc", new HealthCheckOptions()
                 //{
                 //    Predicate = _ => true,

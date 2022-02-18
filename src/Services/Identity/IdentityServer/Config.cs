@@ -1,9 +1,6 @@
-﻿using IdentityModel;
-using IdentityServer4;
+﻿using IdentityServer4;
 using IdentityServer4.Models;
-using IdentityServer4.Test;
 using System.Collections.Generic;
-using System.Security.Claims;
 
 namespace IdentityServer
 {
@@ -45,13 +42,15 @@ namespace IdentityServer
                        {
                            IdentityServerConstants.StandardScopes.OpenId,
                            IdentityServerConstants.StandardScopes.Profile,
-                           //IdentityServerConstants.StandardScopes.Address,
-                           //IdentityServerConstants.StandardScopes.Email,
+                           IdentityServerConstants.StandardScopes.Address,
+                           IdentityServerConstants.StandardScopes.Email,
+
                            "basketAPI",
                            "catalogAPI",
                            "orderAPI",
-                           //"roles"
-                       }
+                           "roles"
+                       },
+                       AllowOfflineAccess = true
                    }
             };
 
@@ -75,28 +74,29 @@ namespace IdentityServer
           {
               new IdentityResources.OpenId(),
               new IdentityResources.Profile(),
-              //new IdentityResources.Address(),
-              //new IdentityResources.Email(),
-              //new IdentityResource(
-              //      "roles",
-              //      "Your role(s)",
-              //      new List<string>() { "role" })
+              new IdentityResources.Address(),
+              new IdentityResources.Email(),
+
+              new IdentityResource(
+                    "roles",
+                    "Your role(s)",
+                    new List<string>() { "role" })
           };
 
-        public static List<TestUser> TestUsers =>
-            new List<TestUser>
-            {
-                new TestUser
-                {
-                    SubjectId = "5BE86359-073C-434B-AD2D-A3932222DABE",
-                    Username = "mehmet",
-                    Password = "swn",
-                    Claims = new List<Claim>
-                    {
-                        new Claim(JwtClaimTypes.GivenName, "mehmet"),
-                        new Claim(JwtClaimTypes.FamilyName, "ozkaya")
-                    }
-                }
-            };
+        //public static List<TestUser> TestUsers =>
+        //    new List<TestUser>
+        //    {
+        //        new TestUser
+        //        {
+        //            SubjectId = "5BE86359-073C-434B-AD2D-A3932222DABE",
+        //            Username = "mehmet",
+        //            Password = "swn",
+        //            Claims = new List<Claim>
+        //            {
+        //                new Claim(JwtClaimTypes.GivenName, "mehmet"),
+        //                new Claim(JwtClaimTypes.FamilyName, "ozkaya")
+        //            }
+        //        }
+        //    };
     }
 }
