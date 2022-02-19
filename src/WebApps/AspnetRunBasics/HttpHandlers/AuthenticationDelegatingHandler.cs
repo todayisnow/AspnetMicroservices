@@ -19,7 +19,7 @@ namespace AspnetRunBasics.HttpHandlers
         {
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
-        public async void RefreshToken()//More Investigation
+        public async Task RefreshToken()//More Investigation
         {
             var expat = await _httpContextAccessor.HttpContext.GetTokenAsync("expires_at");
 
@@ -109,7 +109,7 @@ namespace AspnetRunBasics.HttpHandlers
 
             if (!string.IsNullOrWhiteSpace(accessToken))
             {
-                RefreshToken();
+                await RefreshToken();
                 request.SetBearerToken(accessToken);
             }
 

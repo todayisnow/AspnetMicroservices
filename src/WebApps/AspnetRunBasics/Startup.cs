@@ -105,6 +105,7 @@ namespace AspnetRunBasics
                         // options.Scope.Add("profile");
                         options.Scope.Add("address");
                         options.Scope.Add("email");
+
                         options.Scope.Add("roles");
 
                         options.Scope.Add("offline_access");

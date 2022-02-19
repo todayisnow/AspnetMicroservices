@@ -103,7 +103,10 @@ namespace IdentityServerHost.Quickstart.UI
                 // simply auto-provisions new external user
                 user = await AutoProvisionUserAsync(provider, providerUserId, claims);
             }
-
+            if (!user.IsEnabled)
+            {
+                throw new Exception("External authentication error. Local user is disabled.");
+            }
             // this allows us to collect any additional claims or properties
             // for the specific protocols used and store them in the local auth cookie.
             // this is typically used to store data needed for signout from those protocols.

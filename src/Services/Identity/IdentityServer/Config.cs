@@ -50,7 +50,9 @@ namespace IdentityServer
                            "orderAPI",
                            "roles"
                        },
-                       AllowOfflineAccess = true
+                       AllowOfflineAccess = true,
+                       AlwaysIncludeUserClaimsInIdToken = true,
+                       UpdateAccessTokenClaimsOnRefresh = true
                    }
             };
 
