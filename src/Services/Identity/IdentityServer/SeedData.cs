@@ -108,47 +108,55 @@ namespace IdentityServer
                     {
                         Log.Debug("bob already exists");
                     }
-                    if (!context.Clients.Any())
-                    {
-                        Log.Debug("Clients being populated");
-                        foreach (var client in Config.Clients.ToList())
-                        {
-                            context.Clients.Add(client.ToEntity());
-                        }
-                        context.SaveChanges();
-                    }
-                    else
-                    {
-                        Log.Debug("Clients already populated");
-                    }
 
-                    if (!context.IdentityResources.Any())
+                    Log.Debug("Clients being populated");
+                    foreach (var client in Config.Clients.ToList())
                     {
-                        Log.Debug("IdentityResources being populated");
-                        foreach (var resource in Config.IdentityResources.ToList())
+                        if (context.Clients.Any(a => a.ClientId == client.ClientId))
                         {
-                            context.IdentityResources.Add(resource.ToEntity());
-                        }
-                        context.SaveChanges();
-                    }
-                    else
-                    {
-                        Log.Debug("IdentityResources already populated");
-                    }
+                            context.Clients.Remove(context.Clients.First(a => a.ClientId == client.ClientId));
 
-                    if (!context.ApiResources.Any())
-                    {
-                        Log.Debug("ApiScopes being populated");
-                        foreach (var resource in Config.ApiScopes.ToList())
-                        {
-                            context.ApiScopes.Add(resource.ToEntity());
                         }
-                        context.SaveChanges();
+
+                        context.Clients.Add(client.ToEntity());
                     }
-                    else
+                    context.SaveChanges();
+
+                    Log.Debug("Clients already populated");
+
+
+
+                    Log.Debug("IdentityResources being populated");
+                    foreach (var resource in Config.IdentityResources.ToList())
                     {
-                        Log.Debug("ApiScopes already populated");
+                        if (context.IdentityResources.Any(a => a.Name == resource.Name))
+                        {
+                            context.IdentityResources.Remove(context.IdentityResources.First(a => a.Name == resource.Name));
+
+                        }
+
+                        context.IdentityResources.Add(resource.ToEntity());
                     }
+                    context.SaveChanges();
+                    Log.Debug("IdentityResources already populated");
+
+
+
+                    Log.Debug("ApiScopes being populated");
+                    foreach (var resource in Config.ApiScopes.ToList())
+                    {
+                        if (context.ApiScopes.Any(a => a.Name == resource.Name))
+                        {
+                            context.ApiScopes.Remove(context.ApiScopes.First(a => a.Name == resource.Name));
+
+                        }
+
+                        context.ApiScopes.Add(resource.ToEntity());
+                    }
+                    context.SaveChanges();
+
+                    Log.Debug("ApiScopes already populated");
+
                 }
             }
         }

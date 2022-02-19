@@ -1,5 +1,4 @@
-﻿using AspnetRunBasics.HttpHandlers;
-using IdentityModel.Client;
+﻿using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -13,7 +12,7 @@ using System.Threading.Tasks;
 namespace AspnetRunBasics
 {
     [Authorize(Roles = "admin")]
-    [TokenFilter]
+
     public class ContactModel : PageModel
     {
         private readonly IHttpClientFactory _httpClientFactory;

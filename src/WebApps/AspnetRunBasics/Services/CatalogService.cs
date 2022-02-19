@@ -22,7 +22,7 @@ namespace AspnetRunBasics.Services
 
 
 
-            var response = await _client.GetAsync("/api/v1/Catalog");
+            var response = await _client.GetAsync("/Catalog");
             response.EnsureSuccessStatusCode();
 
             var content = await response.ReadContentAs<List<CatalogModel>>();

@@ -17,7 +17,7 @@ namespace IdentityServer
                         {
                             new Secret("secret".Sha256())
                         },
-                        AllowedScopes = { "basketAPI", "catalogAPI", "orderAPI" }
+                        AllowedScopes = { "basketAPI", "catalogAPI", "orderAPI" , "OcelotApiGw" }
                    },
                    new Client
                    {
@@ -48,6 +48,7 @@ namespace IdentityServer
                            "basketAPI",
                            "catalogAPI",
                            "orderAPI",
+                           "OcelotApiGw",
                            "roles"
                        },
                        AllowOfflineAccess = true,
@@ -61,7 +62,8 @@ namespace IdentityServer
            {
                new ApiScope("basketAPI", "Basket API"),
                new ApiScope("catalogAPI", "Catalog API"),
-               new ApiScope("orderAPI", "Order API")
+               new ApiScope("orderAPI", "Order API"),
+               new ApiScope("OcelotApiGw", "Ocelot API Gateway")
 
            };
 

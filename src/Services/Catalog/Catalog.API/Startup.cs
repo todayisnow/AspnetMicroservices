@@ -36,7 +36,7 @@ namespace Catalog.API
             services.AddAuthentication("Bearer")
                     .AddJwtBearer("Bearer", options =>
                     {
-                        options.Authority = "https://localhost:5007";
+                        options.Authority = Configuration["IdentityServer:Uri"];
                         options.TokenValidationParameters = new TokenValidationParameters
                         {
                             ValidateAudience = false

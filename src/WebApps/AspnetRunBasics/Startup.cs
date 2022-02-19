@@ -47,13 +47,25 @@ namespace AspnetRunBasics
             //.AddPolicyHandler(GetCircuitBreakerPolicy());
 
             services.AddHttpClient<IBasketService, BasketService>(c =>
-                c.BaseAddress = new Uri(Configuration["ApiSettings:GatewayAddress"]));
+            {
+                c.BaseAddress = new Uri(Configuration["ApiSettings:GatewayAddress"]);
+                c.DefaultRequestHeaders.Clear();
+                c.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
+
+
+            }).AddHttpMessageHandler<AuthenticationDelegatingHandler>();
             //.AddHttpMessageHandler<LoggingDelegatingHandler>()
             //.AddPolicyHandler(GetRetryPolicy())
             //.AddPolicyHandler(GetCircuitBreakerPolicy());
 
             services.AddHttpClient<IOrderService, OrderService>(c =>
-                c.BaseAddress = new Uri(Configuration["ApiSettings:GatewayAddress"]));
+            {
+                c.BaseAddress = new Uri(Configuration["ApiSettings:GatewayAddress"]);
+                c.DefaultRequestHeaders.Clear();
+                c.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
+
+
+            }).AddHttpMessageHandler<AuthenticationDelegatingHandler>();
             //.AddHttpMessageHandler<LoggingDelegatingHandler>()
             //.AddPolicyHandler(GetRetryPolicy())
             //.AddPolicyHandler(GetCircuitBreakerPolicy());
@@ -75,12 +87,8 @@ namespace AspnetRunBasics
             services.AddHttpContextAccessor();
 
 
-            services.AddTransient<TokenFilterAttribute>();
 
-            services.AddRazorPages().AddMvcOptions(options =>
-            {
-                options.Filters.Add(new TokenFilterAttribute());
-            });
+            services.AddRazorPages();
 
             services.AddAuthentication(options =>
             {
@@ -118,7 +126,7 @@ namespace AspnetRunBasics
 
                         options.Scope.Add("catalogAPI");
                         options.Scope.Add("orderAPI");
-
+                        options.Scope.Add("OcelotApiGw");
                         options.Scope.Add("basketAPI");
 
 
