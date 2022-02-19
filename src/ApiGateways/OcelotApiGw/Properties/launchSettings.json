@@ -16,7 +16,6 @@
     },
     "OcelotApiGw": {
       "commandName": "Project",
-      "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Local"
       },

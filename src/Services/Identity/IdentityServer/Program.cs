@@ -32,6 +32,7 @@ namespace IdentityServer
     .CreateLogger();
             try
             {
+
                 var seed = args.Contains("/seed");
                 if (seed)
                 {
@@ -39,12 +40,14 @@ namespace IdentityServer
                 }
 
                 var host = CreateHostBuilder(args).Build();
-
+                var config = host.Services.GetRequiredService<IConfiguration>();
+                Log.Information(config.GetConnectionString("DefaultConnection"));
                 if (seed)
                 {
                     Log.Information("Seeding database...");
 
-                    var config = host.Services.GetRequiredService<IConfiguration>();
+                    // config = host.Services.GetRequiredService<IConfiguration>();
+                    Log.Information(config.GetConnectionString("DefaultConnection"));
                     var connectionString = config.GetConnectionString("DefaultConnection");
                     SeedData.EnsureSeedData(connectionString);
                     Log.Information("Done seeding database.");

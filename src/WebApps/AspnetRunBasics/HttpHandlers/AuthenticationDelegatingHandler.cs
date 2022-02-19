@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 namespace AspnetRunBasics.HttpHandlers
 {
+
     public class AuthenticationDelegatingHandler : DelegatingHandler
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
