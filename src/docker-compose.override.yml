@@ -238,7 +238,7 @@ services:
       - ASPNETCORE_HTTPS_PORT=8007 
       - ASPNETCORE_Kestrel__Certificates__Default__Password=1234 
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
-      - "ConnectionStrings:DefaultConnection: Server=orderdb;Database=AspIdUsers;User Id=sa;Password=SwN12345678"
+      - "ConnectionStrings:DefaultConnection:Server=orderdb;Database=AspIdUsers;User Id=sa;Password=SwN12345678"
     depends_on:
       - orderdb
     ports:

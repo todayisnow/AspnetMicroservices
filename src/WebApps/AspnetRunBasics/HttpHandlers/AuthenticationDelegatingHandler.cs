@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -16,9 +15,10 @@ namespace AspnetRunBasics.HttpHandlers
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AuthenticationDelegatingHandler(IHttpContextAccessor httpContextAccessor)
+        public AuthenticationDelegatingHandler(IHttpContextAccessor httpContextAccessor, IHttpClientFactory httpClientFactory)
         {
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+            _httpClientFactory = httpClientFactory;
         }
         public async Task RefreshToken()//More Investigation
         {
@@ -28,10 +28,7 @@ namespace AspnetRunBasics.HttpHandlers
 
             if ((dataExp - DateTime.Now).TotalMinutes < 60)
             {
-                var client = new HttpClient();
-                client.BaseAddress = new Uri("https://localhost:5007");
-                client.DefaultRequestHeaders.Clear();
-                client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
+                var client = _httpClientFactory.CreateClient("IDPClient");
 
                 var disco = await client.GetDiscoveryDocumentAsync();
                 if (disco.IsError) throw new Exception(disco.Error);
@@ -85,7 +82,7 @@ namespace AspnetRunBasics.HttpHandlers
             }
         }
 
-        //private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IHttpClientFactory _httpClientFactory;
         //private readonly ClientCredentialsTokenRequest _tokenRequest;
 
         //public AuthenticationDelegatingHandler(IHttpClientFactory httpClientFactory, ClientCredentialsTokenRequest tokenRequest)
