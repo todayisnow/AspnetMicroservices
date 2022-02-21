@@ -246,7 +246,8 @@ services:
     volumes:
       - ${USERPROFILE}\.aspnet\https:/https
 
-
+      https://github.com/skoruba/AuditLogging
+      https://github.com/skoruba/IdentityServer4.Admin
 ##create a SAN cert for both host.docker.internal and localhost
 #$cert = New-SelfSignedCertificate -DnsName "host.docker.internal", "localhost" -CertStoreLocation cert:\localmachine\my
 
