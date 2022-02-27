@@ -40,7 +40,9 @@ namespace Catalog.API
                         options.TokenValidationParameters = new TokenValidationParameters
                         {
                             ValidateAudience = false
+
                         };
+
                     });
             services.AddAuthorization(options =>
             {

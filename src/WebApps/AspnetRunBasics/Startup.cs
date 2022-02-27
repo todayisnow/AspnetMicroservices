@@ -13,6 +13,7 @@ using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using System;
+using System.Net;
 
 namespace AspnetRunBasics
 {
@@ -28,6 +29,9 @@ namespace AspnetRunBasics
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12
+                                                 | SecurityProtocolType.Tls11
+                                                 | SecurityProtocolType.Tls13;
 
             //services.AddTransient<LoggingDelegatingHandler>();
             IdentityModelEventSource.ShowPII = true;
@@ -108,12 +112,16 @@ namespace AspnetRunBasics
                         options.ClientId = "aspnetRunBasics_client";
                         options.ClientSecret = "secret";
                         options.ResponseType = "code id_token";
-
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            NameClaimType = JwtClaimTypes.Name,
+                            RoleClaimType = JwtClaimTypes.Role
+                        };
                         //options.Scope.Add("openid"); come automatically
                         // options.Scope.Add("profile");
                         options.Scope.Add("address");
                         options.Scope.Add("email");
-
+                        options.Scope.Add("profile");
                         options.Scope.Add("roles");
 
                         options.Scope.Add("offline_access");
@@ -134,11 +142,7 @@ namespace AspnetRunBasics
                         options.GetClaimsFromUserInfoEndpoint = true;
 
 
-                        options.TokenValidationParameters = new TokenValidationParameters
-                        {
-                            NameClaimType = JwtClaimTypes.GivenName,
-                            RoleClaimType = JwtClaimTypes.Role
-                        };
+
                     });
 
 
