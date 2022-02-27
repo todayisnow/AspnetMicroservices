@@ -75,7 +75,7 @@ services:
     container_name: catalog.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - "IdentityServer:Uri=https://identityserver"
+      - "IdentityServer:Uri=https://localhost:44310"
       - "DatabaseSettings:ConnectionString=mongodb://catalogdb:27017"
       - ASPNETCORE_URLS=https://+:443 
       - ASPNETCORE_HTTPS_PORT=8000 
@@ -94,7 +94,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - "CacheSettings:ConnectionString=basketdb:6379"
-      - "IdentityServer:Uri=https://identityserver"
+      - "IdentityServer:Uri=https://localhost:44310"
       - "GrpcSettings:DiscountUrl=https://discount.grpc"
       - "EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672"
       - ASPNETCORE_URLS=https://+:443 
@@ -151,7 +151,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - "ConnectionStrings:OrderingConnectionString=Server=orderdb;Database=OrderDb;User Id=sa;Password=SwN12345678"
       - "EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672"
-      - "IdentityServer:Uri=https://identityserver"
+      - "IdentityServer:Uri=https://localhost:44310"
       - ASPNETCORE_URLS=https://+:443 
       - ASPNETCORE_HTTPS_PORT=8004 
       - ASPNETCORE_Kestrel__Certificates__Default__Password=1234 
@@ -170,7 +170,7 @@ services:
     container_name: ocelotapigw
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - "IdentityServer:Uri=https://identityserver"
+      - "IdentityServer:Uri=https://localhost:44310"
       - ASPNETCORE_URLS=https://+:443 
       - ASPNETCORE_HTTPS_PORT=8010
       - ASPNETCORE_Kestrel__Certificates__Default__Password=1234 
@@ -208,7 +208,7 @@ services:
     environment:
         - ASPNETCORE_ENVIRONMENT=Development
         - "ApiSettings:GatewayAddress=https://ocelotapigw"
-        - "IdentityServer:Uri=https://identityserver"
+        - "IdentityServer:Uri=https://localhost:44310"
         - ASPNETCORE_URLS=https://+:443 
         - ASPNETCORE_HTTPS_PORT=8006 
         - ASPNETCORE_Kestrel__Certificates__Default__Password=1234 
@@ -246,8 +246,7 @@ services:
     volumes:
       - ${USERPROFILE}\.aspnet\https:/https
 
-      https://github.com/skoruba/AuditLogging
-      https://github.com/skoruba/IdentityServer4.Admin
+  
 ##create a SAN cert for both host.docker.internal and localhost
 #$cert = New-SelfSignedCertificate -DnsName "host.docker.internal", "localhost" -CertStoreLocation cert:\localmachine\my
 

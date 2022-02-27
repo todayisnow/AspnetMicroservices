@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
+using System.Net;
 
 namespace Discount.Grpc
 {
@@ -25,6 +25,9 @@ namespace Discount.Grpc
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12
+                                                 | SecurityProtocolType.Tls11
+                                                 | SecurityProtocolType.Tls13;
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
