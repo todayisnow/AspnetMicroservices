@@ -115,12 +115,16 @@ namespace AspnetRunBasics
                         options.ClientSecret = "secret";
 
                         options.ResponseType = "code id_token";
-
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            NameClaimType = JwtClaimTypes.Name,
+                            RoleClaimType = JwtClaimTypes.Role
+                        };
                         //options.Scope.Add("openid"); come automatically
                         // options.Scope.Add("profile");
                         options.Scope.Add("address");
                         options.Scope.Add("email");
-
+                        options.Scope.Add("profile");
                         options.Scope.Add("roles");
 
                         options.Scope.Add("offline_access");
@@ -141,11 +145,7 @@ namespace AspnetRunBasics
                         options.GetClaimsFromUserInfoEndpoint = true;
 
 
-                        options.TokenValidationParameters = new TokenValidationParameters
-                        {
-                            NameClaimType = JwtClaimTypes.GivenName,
-                            RoleClaimType = JwtClaimTypes.Role
-                        };
+
                     });
 
 

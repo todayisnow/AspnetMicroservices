@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Net;
 
 namespace Catalog.API
 {
@@ -24,6 +25,9 @@ namespace Catalog.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12
+                                                 | SecurityProtocolType.Tls11
+                                                 | SecurityProtocolType.Tls13;
             services.AddScoped<ICatalogContext, CatalogContext>();
             services.AddScoped<IProductRepository, ProductRepository>();
 
@@ -40,7 +44,9 @@ namespace Catalog.API
                         options.TokenValidationParameters = new TokenValidationParameters
                         {
                             ValidateAudience = false
+
                         };
+
                     });
             services.AddAuthorization(options =>
             {

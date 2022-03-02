@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
+using System.Net;
 
 namespace IdentityServer
 {
@@ -28,7 +29,9 @@ namespace IdentityServer
 
         public void ConfigureServices(IServiceCollection services)
         {
-
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12
+                                                 | SecurityProtocolType.Tls11
+                                                 | SecurityProtocolType.Tls13;
             services.AddControllersWithViews();
             services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(Configuration["ConnectionStrings:DefaultConnection"]));
