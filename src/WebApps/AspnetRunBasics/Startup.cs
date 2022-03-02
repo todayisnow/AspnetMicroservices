@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace AspnetRunBasics
 {
@@ -120,6 +121,11 @@ namespace AspnetRunBasics
                             NameClaimType = JwtClaimTypes.Name,
                             RoleClaimType = JwtClaimTypes.Role
                         };
+                        options.Events = new OpenIdConnectEvents
+                        {
+                            OnMessageReceived = context => OnMessageReceived(context),
+                            OnRedirectToIdentityProvider = context => OnRedirectToIdentityProvider(context)
+                        };
                         //options.Scope.Add("openid"); come automatically
                         // options.Scope.Add("profile");
                         options.Scope.Add("address");
@@ -153,7 +159,22 @@ namespace AspnetRunBasics
             //services.AddHealthChecks()
             //    .AddUrlGroup(new Uri(Configuration["ApiSettings:GatewayAddress"]), "Ocelot API Gw", HealthStatus.Degraded);
         }
+        private static Task OnMessageReceived(MessageReceivedContext context)
+        {
+            context.Properties.IsPersistent = true;
+            context.Properties.ExpiresUtc = new DateTimeOffset(DateTime.Now.AddHours(12));
 
+            return Task.CompletedTask;
+        }
+
+        private static Task OnRedirectToIdentityProvider(RedirectContext context)
+        {
+
+            context.ProtocolMessage.RedirectUri = "https://web.skoruba.local/signin-oidc";
+
+
+            return Task.CompletedTask;
+        }
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -167,7 +188,7 @@ namespace AspnetRunBasics
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-            app.UseHttpsRedirection();
+
             app.UseStaticFiles();
 
             app.UseRouting();

@@ -3,9 +3,6 @@
     "Roles": [
       {
         "Name": "SkorubaIdentityAdminAdministrator"
-      },
-	  {
-        "Name": "admin"
       }
     ],
     "Users": [
@@ -14,8 +11,7 @@
         "Password": "Pa$$word123",
         "Email": "admin@skoruba.com",
         "Roles": [
-          "SkorubaIdentityAdminAdministrator",
-		  "admin"
+          "SkorubaIdentityAdminAdministrator"
         ],
         "Claims": [
           {

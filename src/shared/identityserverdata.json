@@ -138,6 +138,7 @@
                 "RedirectUris": [
                     "https://admin-api.skoruba.local/swagger/oauth2-redirect.html"
                 ],
+"FrontChannelLogoutUri": "https://web.skoruba.local/signout-oidc",
                 "AllowedScopes": [
                     "skoruba_identity_admin_api"
                 ],
@@ -148,18 +149,18 @@
 			{
   "ClientId": "aspnetRunBasics_client",
   "ClientName": "AspnetRun Basics Razor App",
+"ClientUri": "https://web.skoruba.local",
   "AllowedGrantTypes": [
     "hybrid"
   ],
   "RequirePkce": false,
   "AllowRememberConsent": false,
-  "RedirectUris": [
-
-    "https://localhost:5006/signin-oidc"
-
-  ],
+	"RedirectUris": [
+                    "https://web.skoruba.local/signin-oidc"
+                ],
+ 
   "PostLogoutRedirectUris": [
-    "https://localhost:5006/signout-callback-oidc"
+    "https://web.skoruba.local/signout-callback-oidc"
   ],
   "ClientSecrets": [
     {
