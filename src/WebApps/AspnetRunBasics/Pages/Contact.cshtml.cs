@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace AspnetRunBasics
 {
-    [Authorize(Roles = "admin")]
+    [Authorize()]
 
     public class ContactModel : PageModel
     {

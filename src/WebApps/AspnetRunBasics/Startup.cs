@@ -13,6 +13,7 @@ using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using System;
+using System.Net;
 
 namespace AspnetRunBasics
 {
@@ -28,6 +29,10 @@ namespace AspnetRunBasics
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls
+                                       | SecurityProtocolType.Tls11
+                                       | SecurityProtocolType.Tls12
+                                       | SecurityProtocolType.Tls13;
 
             //services.AddTransient<LoggingDelegatingHandler>();
             IdentityModelEventSource.ShowPII = true;
@@ -104,9 +109,11 @@ namespace AspnetRunBasics
                     .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
                     {
                         options.Authority = Configuration["IdentityServer:Uri"];
-
+                        //dev only
+                        options.RequireHttpsMetadata = false;
                         options.ClientId = "aspnetRunBasics_client";
                         options.ClientSecret = "secret";
+
                         options.ResponseType = "code id_token";
 
                         //options.Scope.Add("openid"); come automatically

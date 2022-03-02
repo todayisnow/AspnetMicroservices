@@ -8,12 +8,18 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db 
+    networks:
+      identityserverui: null
+
 
   basketdb:
     container_name: basketdb
     restart: always
     ports:
       - "6379:6379"
+    networks:
+      identityserverui: null
+
   discountdb:
     container_name: discountdb
     environment:
@@ -25,21 +31,31 @@ services:
       - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data/ 
+    networks:
+      identityserverui: null
   
-  orderdb:
-    container_name: orderdb
+  sqlServer:
+    container_name: sqlServer
     environment:
-        SA_PASSWORD: "SwN12345678"
+        SA_PASSWORD: '${DB_PASSWORD:-Password_123}'
         ACCEPT_EULA: "Y"
     restart: always
     ports:
         - "5555:1433"
+    volumes:
+      - 'dbdata:/var/opt/mssql'
+    networks:
+      identityserverui: null
+
   rabbitmq:
     container_name: rabbitmq
     restart: always
     ports:
         - "5672:5672"
         - "15672:15672"
+    networks:
+      identityserverui: null
+
   pgadmin:
     container_name: pgadmin
     environment:
@@ -50,7 +66,8 @@ services:
       - "5050:80"
     volumes:
       - pgadmin-data:/root/.pgadmin 
-
+    networks:
+      identityserverui: null
 
   portainer:
     container_name: portainer
@@ -61,6 +78,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer-data:/data
+    networks:
+      identityserverui: null
 
   #mongoclient:
   #  image: mongoclient/mongoclient:latest
@@ -70,149 +89,267 @@ services:
   #    - mongodb
   #  ports:
   #    - 3000:3000
-            
+
+  ############### IDENTITY SERVER ################       
+  
+  nginx-proxy:
+   
+     container_name: nginx
+     ports:
+      - '80:80'
+      - '443:443'
+     volumes:
+      - '/var/run/docker.sock:/tmp/docker.sock:ro'
+      - './shared/nginx/vhost.d:/etc/nginx/vhost.d'
+      - './shared/nginx/certs:/etc/nginx/certs:ro'
+     networks:
+      proxy: null
+      identityserverui:
+        aliases:
+          - sts.skoruba.local
+          - admin.skoruba.local
+          - admin-api.skoruba.local
+          - web.skoruba.local
+          - ocelot.skoruba.local
+          - catalog.skoruba.local
+          - order.skoruba.local
+          - basket.skoruba.local
+          - discount.skoruba.local
+          - discountgrpc.skoruba.local
+          - aggregator.skoruba.local
+     restart: always
+
+  identityserver.admin:
+    
+    container_name: identityserveradmin
+    environment:
+      - VIRTUAL_HOST=admin.skoruba.local
+      - 'ConnectionStrings__ConfigurationDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
+      - 'ConnectionStrings__PersistedGrantDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
+      - 'ConnectionStrings__IdentityDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
+      - 'ConnectionStrings__AdminLogDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
+      - 'ConnectionStrings__AdminAuditLogDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
+      - 'ConnectionStrings__DataProtectionDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
+      - 'AdminConfiguration__IdentityAdminBaseUrl=https://admin.skoruba.local'
+      - 'AdminConfiguration__IdentityAdminRedirectUri=https://admin.skoruba.local/signin-oidc'
+      - 'AdminConfiguration__IdentityServerBaseUrl=https://sts.skoruba.local'
+      - AdminConfiguration__RequireHttpsMetadata=false
+      - 'IdentityServerData__Clients__0__ClientUri=https://admin.skoruba.local'
+      - 'IdentityServerData__Clients__0__RedirectUris__0=https://admin.skoruba.local/signin-oidc'
+      - 'IdentityServerData__Clients__0__FrontChannelLogoutUri=https://admin.skoruba.local/signin-oidc'
+      - 'IdentityServerData__Clients__0__PostLogoutRedirectUris__0=https://admin.skoruba.local/signout-callback-oidc'
+      - 'IdentityServerData__Clients__0__AllowedCorsOrigins__0=https://admin.skoruba.local'
+      - 'IdentityServerData__Clients__1__RedirectUris__0=https://admin-api.skoruba.local/swagger/oauth2-redirect.html'
+      - 'Serilog__WriteTo__1__Args__connectionString=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
+      - DockerConfiguration__UpdateCaCertificate=true
+      - ASPNETCORE_ENVIRONMENT=Development
+    command: dotnet Skoruba.IdentityServer4.Admin.dll /seed
+    depends_on:
+      - sqlServer
+      - identityserver.sts.identity
+    volumes:
+      - './shared/serilog.json:/app/serilog.json'
+      - './shared/identitydata.json:/app/identitydata.json'
+      - './shared/identityserverdata.json:/app/identityserverdata.json'
+      - './shared/nginx/certs/cacerts.crt:/usr/local/share/ca-certificates/cacerts.crt'
+    networks:
+      identityserverui: null
+
+  identityserver.admin.api:
+   
+
+    container_name: identityserveradminapi
+    environment:
+      - VIRTUAL_HOST=admin-api.skoruba.local
+      - AdminApiConfiguration__RequireHttpsMetadata=false
+      - 'AdminApiConfiguration__ApiBaseUrl=https://admin-api.skoruba.local'
+      - 'AdminApiConfiguration__IdentityServerBaseUrl=https://sts.skoruba.local'
+      - 'ConnectionStrings__ConfigurationDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
+      - 'ConnectionStrings__PersistedGrantDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
+      - 'ConnectionStrings__IdentityDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
+      - 'ConnectionStrings__AdminLogDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
+      - 'ConnectionStrings__AdminAuditLogDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
+      - 'ConnectionStrings__DataProtectionDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
+      - DockerConfiguration__UpdateCaCertificate=true
+      - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+      - './shared/serilog.json:/app/serilog.json'
+      - './shared/nginx/certs/cacerts.crt:/usr/local/share/ca-certificates/cacerts.crt'
+    networks:
+      identityserverui: null
+
+
+  identityserver.sts.identity:
+
+    container_name: identityserverstsidentity
+    environment:
+      - VIRTUAL_HOST=sts.skoruba.local
+      - 'ConnectionStrings__ConfigurationDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
+      - 'ConnectionStrings__PersistedGrantDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
+      - 'ConnectionStrings__IdentityDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
+      - 'ConnectionStrings__DataProtectionDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
+      - 'AdminConfiguration__IdentityAdminBaseUrl=https://admin.skoruba.local'
+      - 'IdentityServerOptions__IssuerUri=https://sts.skoruba.local'
+      - IdentityServerOptions__Events__RaiseErrorEvents=true
+      - IdentityServerOptions__Events__RaiseInformationEvents=true
+      - IdentityServerOptions__Events__RaiseFailureEvents=true
+      - IdentityServerOptions__Events__RaiseSuccessEvents=true
+      - DockerConfiguration__UpdateCaCertificate=true
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - sqlServer
+    volumes:
+      - './shared/serilog.json:/app/serilog.json'
+      - './shared/nginx/certs/cacerts.crt:/usr/local/share/ca-certificates/cacerts.crt'
+    networks:
+      identityserverui:
+        aliases:
+          - sts.skoruba.local
+
+
+
+
+#################################################################
+
   catalog.api:
     container_name: catalog.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - "IdentityServer:Uri=https://identityserver"
       - "DatabaseSettings:ConnectionString=mongodb://catalogdb:27017"
-      - ASPNETCORE_URLS=https://+:443 
-      - ASPNETCORE_HTTPS_PORT=8000 
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=1234 
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - "IdentityServer:Uri=https://sts.skoruba.local"
+      - DockerConfiguration__UpdateCaCertificate=true
+      - VIRTUAL_HOST=catalog.skoruba.local
     depends_on:
       - catalogdb
-      - identityserver
-    ports:
-      - "8000:443"
+      - identityserver.sts.identity
     volumes:
-        - ${USERPROFILE}\.aspnet\https:/https
+        - './shared/nginx/certs/cacerts.crt:/usr/local/share/ca-certificates/cacerts.crt'
+    networks:
+      identityserverui: null
 
   basket.api:
     container_name: basket.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - "CacheSettings:ConnectionString=basketdb:6379"
-      - "IdentityServer:Uri=https://identityserver"
-      - "GrpcSettings:DiscountUrl=https://discount.grpc"
+      
+      - "GrpcSettings:DiscountUrl=https://discountgrpc.skoruba.local"
       - "EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672"
-      - ASPNETCORE_URLS=https://+:443 
-      - ASPNETCORE_HTTPS_PORT=8001 
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=1234 
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - "IdentityServer:Uri=https://sts.skoruba.local"
+      - DockerConfiguration__UpdateCaCertificate=true
+      - VIRTUAL_HOST=basket.skoruba.local
+     
     depends_on:
       - basketdb
       - rabbitmq
-      - identityserver
-    ports:
-      - "8001:443"
+      - identityserver.sts.identity
     volumes:
-        - ${USERPROFILE}\.aspnet\https:/https
+     - './shared/nginx/certs/cacerts.crt:/usr/local/share/ca-certificates/cacerts.crt'
+    networks:
+       identityserverui: null
 
 
   discount.api:
     container_name: discount.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443 
-      - ASPNETCORE_HTTPS_PORT=8002 
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=1234 
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - DockerConfiguration__UpdateCaCertificate=true
+      - VIRTUAL_HOST=discount.skoruba.local
       - "DatabaseSettings:ConnectionString=Server=discountdb;Port=5432;Database=DiscountDb;User Id=admin;Password=admin1234;"
     depends_on:
       - discountdb
-    ports:
-      - "8002:443"
+
     volumes:
-        - ${USERPROFILE}\.aspnet\https:/https
+     - './shared/nginx/certs/cacerts.crt:/usr/local/share/ca-certificates/cacerts.crt'
+    networks:
+       identityserverui: null
 
 
   discount.grpc:
     container_name: discount.grpc
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443 
-      - ASPNETCORE_HTTPS_PORT=8003 
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=1234 
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - DockerConfiguration__UpdateCaCertificate=true
+      - VIRTUAL_HOST=discountgrpc.skoruba.local      
       - "DatabaseSettings:ConnectionString=Server=discountdb;Port=5432;Database=DiscountDb;User Id=admin;Password=admin1234;"
     depends_on:
       - discountdb
       
-    ports:
-      - "8003:443"
     volumes:
-        - ${USERPROFILE}\.aspnet\https:/https
+     - './shared/nginx/certs/cacerts.crt:/usr/local/share/ca-certificates/cacerts.crt'
+    networks:
+       identityserverui: null
 
   ordering.api:
     container_name: ordering.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - "ConnectionStrings:OrderingConnectionString=Server=orderdb;Database=OrderDb;User Id=sa;Password=SwN12345678"
+      - "ConnectionStrings:OrderingConnectionString=Server=sqlServer;Database=orderdb;User Id=sa;Password=${DB_PASSWORD:-Password_123}"
       - "EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672"
-      - "IdentityServer:Uri=https://identityserver"
-      - ASPNETCORE_URLS=https://+:443 
-      - ASPNETCORE_HTTPS_PORT=8004 
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=1234 
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - "IdentityServer:Uri=https://sts.skoruba.local"
+      - DockerConfiguration__UpdateCaCertificate=true
+      - VIRTUAL_HOST=order.skoruba.local
     depends_on:
-      - orderdb
+      - sqlServer
       - rabbitmq
-      - identityserver
-    ports:
-      - "8004:443"
+      - identityserver.sts.identity
+
     volumes:
-        - ${USERPROFILE}\.aspnet\https:/https
+     - './shared/nginx/certs/cacerts.crt:/usr/local/share/ca-certificates/cacerts.crt'
+    networks:
+       identityserverui: null
+
 
 
   ocelotapigw:
     container_name: ocelotapigw
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - "IdentityServer:Uri=https://identityserver"
-      - ASPNETCORE_URLS=https://+:443 
-      - ASPNETCORE_HTTPS_PORT=8010
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=1234 
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - "IdentityServer:Uri=https://sts.skoruba.local"
+      - DockerConfiguration__UpdateCaCertificate=true
+      - VIRTUAL_HOST=ocelot.skoruba.local
     depends_on:
         - catalog.api
         - basket.api
         - discount.api
         - ordering.api
-        - identityserver
-    ports:
-      - "8010:443"
+        - identityserver.sts.identity
     volumes:
-        - ${USERPROFILE}\.aspnet\https:/https
+     - './shared/nginx/certs/cacerts.crt:/usr/local/share/ca-certificates/cacerts.crt'
+    networks:
+       identityserverui: null
 
   shopping.aggregator:
     container_name: shopping.aggregator
     environment:
         - ASPNETCORE_ENVIRONMENT=Development
-        - "ApiSettings:CatalogUrl=https://catalog.api"
-        - "ApiSettings:BasketUrl=https://basket.api"
-        - "ApiSettings:OrderingUrl=https://ordering.api"
+        - "ApiSettings:CatalogUrl=https://catalog.skoruba.local"
+        - "ApiSettings:BasketUrl=https://basket.skoruba.local"
+        - "ApiSettings:OrderingUrl=https://ordering.skoruba.local"
+        - "IdentityServer:Uri=https://sts.skoruba.local"
+        - DockerConfiguration__UpdateCaCertificate=true
+        - VIRTUAL_HOST=aggregator.skoruba.local
         
     depends_on:
         - catalog.api
         - basket.api
         - ordering.api
-    ports:
-        - "8005:80"
+        - identityserver.sts.identity
+    volumes:
+     - './shared/nginx/certs/cacerts.crt:/usr/local/share/ca-certificates/cacerts.crt'
+    networks:
+     identityserverui: null
 
 
 
   aspnetrunbasics:
     container_name: aspnetrunbasics
     environment:
-        - ASPNETCORE_ENVIRONMENT=Development
-        - "ApiSettings:GatewayAddress=https://ocelotapigw"
-        - "IdentityServer:Uri=https://identityserver"
-        - ASPNETCORE_URLS=https://+:443 
-        - ASPNETCORE_HTTPS_PORT=8006 
-        - ASPNETCORE_Kestrel__Certificates__Default__Password=1234 
-        - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "ApiSettings__GatewayAddress=https://ocelot.skoruba.local"
+      - "IdentityServer__Uri=https://sts.skoruba.local"
+      - DockerConfiguration__UpdateCaCertificate=true
+      - VIRTUAL_HOST=web.skoruba.local
         
     depends_on:
         - ocelotapigw
@@ -220,34 +357,18 @@ services:
         - basket.api
         - discount.api
         - ordering.api
-        - identityserver
+        - identityserver.sts.identity
        
-    ports:
-        - "8006:443"
     volumes:
-        - ${USERPROFILE}\.aspnet\https:/https
+     - './shared/nginx/certs/cacerts.crt:/usr/local/share/ca-certificates/cacerts.crt'
+    networks:
+       identityserverui: null
         
    
     
 
-  identityserver:
-    container_name: identityserver
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443 
-      - ASPNETCORE_HTTPS_PORT=8007 
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=1234 
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
-      - "ConnectionStrings:DefaultConnection:Server=orderdb;Database=AspIdUsers;User Id=sa;Password=SwN12345678"
-    depends_on:
-      - orderdb
-    ports:
-      - "8007:443"
-    volumes:
-      - ${USERPROFILE}\.aspnet\https:/https
-
-      https://github.com/skoruba/AuditLogging
-      https://github.com/skoruba/IdentityServer4.Admin
+   
+      
 ##create a SAN cert for both host.docker.internal and localhost
 #$cert = New-SelfSignedCertificate -DnsName "host.docker.internal", "localhost" -CertStoreLocation cert:\localmachine\my
 
@@ -260,3 +381,5 @@ services:
 #$store.Open("ReadWrite")
 #$store.Add($cert)
 #$store.Close()
+
+      #docker run -v $PWD/work -it nginx openssl req -out /work/CSR.csr -new -newkey rsa:2048 -nodes -keyout /work/privateKey.key

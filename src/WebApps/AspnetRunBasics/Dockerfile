@@ -20,4 +20,6 @@ RUN dotnet publish "AspnetRunBasics.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY ./shared/nginx/certs/cacerts.crt /usr/local/share/ca-certificates
+RUN chmod 644 /usr/local/share/ca-certificates/cacerts.crt && update-ca-certificates
 ENTRYPOINT ["dotnet", "AspnetRunBasics.dll"]

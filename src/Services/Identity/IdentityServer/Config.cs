@@ -53,7 +53,8 @@ namespace IdentityServer
                        },
                        AllowOfflineAccess = true,
                        AlwaysIncludeUserClaimsInIdToken = true,
-                       UpdateAccessTokenClaimsOnRefresh = true
+                       UpdateAccessTokenClaimsOnRefresh = true,
+
                    }
             };
 

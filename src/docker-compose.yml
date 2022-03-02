@@ -1,13 +1,34 @@
 version: '3.4'
 
 services:
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+  identityserver.admin:
+    image: ${DOCKER_REGISTRY-}identityserveradmin
+    build:
+     context: .
+     dockerfile: ../../IdentityServer/IdentityServer.Admin/Dockerfile
+  identityserver.admin.api:
+    image: ${DOCKER_REGISTRY-}identityserveradminapi
+    build:
+      context: .
+      dockerfile: ../../IdentityServer/IdentityServer.Admin.Api/Dockerfile
+  identityserver.sts.identity:
+    image: ${DOCKER_REGISTRY-}identityserverstsidentity
+    build:
+      context: .
+      dockerfile: ../../IdentityServer/IdentityServer.STS.Identity/Dockerfile
+
+
+
   catalogdb:
     image: mongo
   basketdb:
     image: redis:alpine
   discountdb:
     image: postgres
-  orderdb:
+  sqlServer:
     image: mcr.microsoft.com/mssql/server:2017-latest
   rabbitmq:
     image: rabbitmq:3-management-alpine
@@ -64,17 +85,21 @@ services:
       context: .
       dockerfile: WebApps/AspnetRunBasics/Dockerfile
 
-  identityserver:
-    image: ${DOCKER_REGISTRY-}identityserver
-    build:
-      context: .
-      dockerfile: services/Identity/IdentityServer/Dockerfile
+
 
 volumes:
   mongo_data:
   portainer-data:
   postgres-data:
   pgadmin-data:
+  dbdata:
+    driver: local
+
+networks:
+  proxy:
+    driver: bridge
+  identityserverui:
+    driver: bridge
   
   
 
