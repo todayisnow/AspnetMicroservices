@@ -168,7 +168,7 @@
     }
   ],
   "AllowedScopes": [
-    "openid",
+    "openId",
     "profile",
     "address",
     "email",
