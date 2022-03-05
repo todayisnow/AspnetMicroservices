@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
@@ -23,6 +25,7 @@ namespace AspnetRunBasics
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
         }
 
         public IConfiguration Configuration { get; }
@@ -30,6 +33,9 @@ namespace AspnetRunBasics
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+
+
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls
                                        | SecurityProtocolType.Tls11
                                        | SecurityProtocolType.Tls12
@@ -96,20 +102,36 @@ namespace AspnetRunBasics
 
             services.AddRazorPages();
 
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.Unspecified;
+                options.Secure = CookieSecurePolicy.SameAsRequest;
+                options.OnAppendCookie = cookieContext =>
+                    AuthenticationHelpers.CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
+                options.OnDeleteCookie = cookieContext =>
+                    AuthenticationHelpers.CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
+            });
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+
+                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultForbidScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultSignOutScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             })
 
-                    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
-                    {
-
-                        options.AccessDeniedPath = "/Account/denied";
-                    })
+                    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme,
+                        options =>
+                        {
+                            options.Cookie.Name = "AspWebApp";
+                        })
                     .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
                     {
+                        options.CallbackPath = "/signin-oidc";
                         options.Authority = Configuration["IdentityServer:Uri"];
+
                         //dev only
                         options.RequireHttpsMetadata = false;
                         options.ClientId = "aspnetRunBasics_client";
@@ -124,8 +146,27 @@ namespace AspnetRunBasics
                         options.Events = new OpenIdConnectEvents
                         {
                             OnMessageReceived = context => OnMessageReceived(context),
-                            OnRedirectToIdentityProvider = context => OnRedirectToIdentityProvider(context)
+
+                            OnRedirectToIdentityProvider = context => OnRedirectToIdentityProvider(context, Configuration["IdentityServer:RedirectUri"]),
+                            OnRemoteFailure = ctx =>
+                            {
+                                using var loggerFactory = LoggerFactory.Create(builder =>
+                                {
+                                    builder.SetMinimumLevel(LogLevel.Information);
+                                    builder.AddConsole();
+                                    builder.AddEventSourceLogger();
+                                });
+                                var logger = loggerFactory.CreateLogger("Startup");
+                                logger.LogInformation("Hello World 2");
+                                logger.LogInformation(ctx.Failure.Message);
+
+                                if (ctx.Failure.InnerException != null)
+                                    logger.LogInformation(ctx.Failure.InnerException.Message);
+                                // React to the error here. See the notes below.
+                                return Task.CompletedTask;
+                            }
                         };
+
                         //options.Scope.Add("openid"); come automatically
                         // options.Scope.Add("profile");
                         options.Scope.Add("address");
@@ -163,14 +204,22 @@ namespace AspnetRunBasics
         {
             context.Properties.IsPersistent = true;
             context.Properties.ExpiresUtc = new DateTimeOffset(DateTime.Now.AddHours(12));
-
+            // context.ProtocolMessage
             return Task.CompletedTask;
         }
 
-        private static Task OnRedirectToIdentityProvider(RedirectContext context)
+        private static Task OnRedirectToIdentityProvider(RedirectContext context, string ruri)
         {
-
-            context.ProtocolMessage.RedirectUri = "https://web.skoruba.local/signin-oidc";
+            using var loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder.SetMinimumLevel(LogLevel.Information);
+                builder.AddConsole();
+                builder.AddEventSourceLogger();
+            });
+            var logger = loggerFactory.CreateLogger("Startup");
+            logger.LogInformation("Hello World");
+            //becasue ngix internal call convert to http
+            context.ProtocolMessage.RedirectUri = ruri;
 
 
             return Task.CompletedTask;
@@ -178,6 +227,7 @@ namespace AspnetRunBasics
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -191,6 +241,16 @@ namespace AspnetRunBasics
 
             app.UseStaticFiles();
 
+
+
+
+
+
+
+            //app.UseForwardedHeaders(new ForwardedHeadersOptions
+            //{
+            //    ForwardedHeaders = ForwardedHeaders.XForwardedProto
+            //});
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();

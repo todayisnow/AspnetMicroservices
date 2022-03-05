@@ -37,7 +37,8 @@ namespace AspnetRunBasics
 
             if (metaDataResponse.IsError)
             {
-                throw new HttpRequestException("Something went wrong while requesting the access token");
+
+                throw new HttpRequestException("Something went wrong while requesting the access token - " + metaDataResponse.Error);
             }
 
             var accessToken = await _httpContextAccessor
