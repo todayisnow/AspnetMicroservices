@@ -127,6 +127,8 @@ services:
     container_name: identityserveradmin
     environment:
       - VIRTUAL_HOST=admin.skoruba.local
+      #- VIRTUAL_PROTO=https
+      #- VIRTUAL_PORT=443
       - 'ConnectionStrings__ConfigurationDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
       - 'ConnectionStrings__PersistedGrantDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
       - 'ConnectionStrings__IdentityDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
@@ -164,6 +166,8 @@ services:
     container_name: identityserveradminapi
     environment:
       - VIRTUAL_HOST=admin-api.skoruba.local
+      #- VIRTUAL_PROTO=https
+      #- VIRTUAL_PORT=443
       - AdminApiConfiguration__RequireHttpsMetadata=false
       - 'AdminApiConfiguration__ApiBaseUrl=https://admin-api.skoruba.local'
       - 'AdminApiConfiguration__IdentityServerBaseUrl=https://sts.skoruba.local'
@@ -187,7 +191,8 @@ services:
     container_name: identityserverstsidentity
     environment:
       - VIRTUAL_HOST=sts.skoruba.local
-      
+      #- VIRTUAL_PROTO=https
+      #- VIRTUAL_PORT=443      
       - 'ConnectionStrings__ConfigurationDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
       - 'ConnectionStrings__PersistedGrantDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
       - 'ConnectionStrings__IdentityDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
@@ -355,6 +360,8 @@ services:
       - "IdentityServer__RedirectUri=https://web.skoruba.local/signin-oidc"
       - DockerConfiguration__UpdateCaCertificate=true
       - VIRTUAL_HOST=web.skoruba.local
+      #- VIRTUAL_PROTO=https
+      #- VIRTUAL_PORT=443
       
         
     depends_on:
