@@ -101,6 +101,7 @@ services:
      
       
      volumes:
+      #- './shared/nginx/reverse_proxy.conf:/etc/nginx/conf.d/default.conf'
       - '/var/run/docker.sock:/tmp/docker.sock:ro'
       - './shared/nginx/vhost.d:/etc/nginx/vhost.d'
       - './shared/nginx/certs:/etc/nginx/certs:ro'
@@ -186,7 +187,7 @@ services:
     container_name: identityserverstsidentity
     environment:
       - VIRTUAL_HOST=sts.skoruba.local
-      - HTTPS_METHOD=noredirect
+      
       - 'ConnectionStrings__ConfigurationDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
       - 'ConnectionStrings__PersistedGrantDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
       - 'ConnectionStrings__IdentityDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
@@ -354,7 +355,7 @@ services:
       - "IdentityServer__RedirectUri=https://web.skoruba.local/signin-oidc"
       - DockerConfiguration__UpdateCaCertificate=true
       - VIRTUAL_HOST=web.skoruba.local
-      - HTTPS_METHOD=noredirect
+      
         
     depends_on:
         - ocelotapigw

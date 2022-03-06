@@ -114,7 +114,7 @@ namespace AspnetRunBasics
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = "oidc";
 
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultForbidScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -127,7 +127,7 @@ namespace AspnetRunBasics
                         {
                             options.Cookie.Name = "AspWebApp";
                         })
-                    .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
+                    .AddOpenIdConnect("oidc", options =>
                     {
                         options.CallbackPath = "/signin-oidc";
                         options.Authority = Configuration["IdentityServer:Uri"];
@@ -195,7 +195,14 @@ namespace AspnetRunBasics
 
                     });
 
+            services.AddHsts(opt =>
+            {
+                opt.Preload = true;
+                opt.IncludeSubDomains = true;
+                opt.MaxAge = TimeSpan.FromDays(365);
 
+                //options.Security.HstsConfigureAction?.Invoke(opt);
+            });
 
             //services.AddHealthChecks()
             //    .AddUrlGroup(new Uri(Configuration["ApiSettings:GatewayAddress"]), "Ocelot API Gw", HealthStatus.Degraded);
@@ -239,6 +246,20 @@ namespace AspnetRunBasics
                 app.UseHsts();
             }
 
+
+
+            // app.UseHsts();
+
+
+            //app.UsePathBase("");
+
+            //// Add custom security headers
+            //app.UseSecurityHeaders(new List<string> { "fonts.googleapis.com",
+            //"fonts.gstatic.com",
+            //"www.gravatar.com" });
+
+
+
             app.UseStaticFiles();
 
 
@@ -266,6 +287,7 @@ namespace AspnetRunBasics
                 //});
             });
         }
+
 
         //private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
         //{

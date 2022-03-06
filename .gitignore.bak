@@ -30,8 +30,6 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
-src/shared/nginx/certs/
-shared/nginx/certs/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
