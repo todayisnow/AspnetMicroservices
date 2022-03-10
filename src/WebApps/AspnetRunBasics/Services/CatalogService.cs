@@ -25,7 +25,7 @@ namespace AspnetRunBasics.Services
         {
 
 
-            _logger.LogInformation("Getting Catalog Products from url:{url}", _client.BaseAddress);
+            _logger.LogInformation("Getting Catalog Products from url:{url} and customProperty:{customProperty}", _client.BaseAddress, 6);
             var response = await _client.GetAsync("/Catalog");
             response.EnsureSuccessStatusCode();
 

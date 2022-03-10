@@ -127,6 +127,7 @@ namespace AspnetRunBasics
                         options =>
                         {
                             options.Cookie.Name = "AspWebApp";
+                            options.AccessDeniedPath = "/denied";
                         })
                     .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
                     {
