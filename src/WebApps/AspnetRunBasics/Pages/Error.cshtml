@@ -11,6 +11,12 @@
 {
     <p>
         <strong>Request ID:</strong> <code>@Model.RequestId</code>
+        @if (!string.IsNullOrEmpty(Model.TraceIdentifier))
+        {
+            <br/>
+            <strong>Identifier:</strong> 
+            <code>@Model.TraceIdentifier</code>
+        }
     </p>
 }
 
