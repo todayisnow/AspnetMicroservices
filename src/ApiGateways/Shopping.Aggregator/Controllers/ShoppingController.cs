@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Shopping.Aggregator.Models;
 using Shopping.Aggregator.Services;
 using System;
@@ -9,6 +10,7 @@ namespace Shopping.Aggregator.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
+    [Authorize]
     public class ShoppingController : ControllerBase
     {
         private readonly ICatalogService _catalogService;
@@ -38,7 +40,7 @@ namespace Shopping.Aggregator.Controllers
                 item.Summary = product.Summary;
                 item.Description = product.Description;
                 item.ImageFile = product.ImageFile;
-            }            
+            }
 
             var orders = await _orderService.GetOrdersByUserName(userName);
 
@@ -48,7 +50,7 @@ namespace Shopping.Aggregator.Controllers
                 BasketWithProducts = basket,
                 Orders = orders
             };
-            
+
             return Ok(shoppingModel);
         }
 

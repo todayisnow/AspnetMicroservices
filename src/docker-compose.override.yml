@@ -390,18 +390,42 @@ services:
     volumes:
         - elasticsearch-data:/usr/share/elasticsearch/data
     networks:
-      identityserverui: null
+      ELK: null
 
   kibana:
     container_name: kibana
     environment:
         - ELASTICSEARCH_URL=http://elasticsearch:9200
+        - 'apm_oss.errorIndices: apm-*'
+        - 'apm_oss.spanIndices: apm-*'
+        - 'apm_oss.transactionIndices: apm-*'
+        - 'apm_oss.onboardingIndices: apm-*'
     depends_on:
         - elasticsearch
     ports:
         - "5601:5601" 
     networks:
-      identityserverui: null
+      ELK: null
+
+
+  apm-server:
+     container_name: apmServer
+     depends_on:
+      - elasticsearch
+      - kibana
+     
+     cap_add: ["CHOWN", "DAC_OVERRIDE", "SETGID", "SETUID"]
+     cap_drop: ["ALL"]
+     ports:
+     - 8200:8200
+     networks:
+       ELK: null
+     command: >
+        apm-server -e --strict.perms=false 
+         
+          -E output.elasticsearch.hosts=["http://elasticsearch:9200"]
+     volumes:
+        - './apm-server.yml:/usr/share/apm-server/apm-server.yml'
 
   #webstatus:
   #  container_name: webstatus

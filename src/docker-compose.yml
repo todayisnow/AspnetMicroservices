@@ -91,6 +91,8 @@ services:
   kibana:
     image: docker.elastic.co/kibana/kibana:7.9.2
 
+  apm-server:
+    image: docker.elastic.co/apm/apm-server:7.9.2
   #webstatus:
   #  image: ${DOCKER_REGISTRY-}webstatus
   #  build:
@@ -111,6 +113,8 @@ networks:
     driver: bridge
   identityserverui:
     driver: bridge
+  ELK:
+     driver: bridge
   
   
 
