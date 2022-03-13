@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using System.Net;
 
 namespace Discount.Grpc
@@ -31,6 +32,24 @@ namespace Discount.Grpc
             services.AddScoped<IDiscountRepository, DiscountRepository>();
             services.AddAutoMapper(typeof(Startup));
             services.AddGrpc();
+            services.AddAuthentication("Bearer")
+      .AddJwtBearer("Bearer", options =>
+      {
+          options.Authority = Configuration["IdentityServer:Uri"];
+          options.TokenValidationParameters = new TokenValidationParameters
+          {
+              ValidateAudience = false
+          };
+      });
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("ClientIdPolicy",
+                    (policy) =>
+                    {
+                        policy.RequireClaim("scope", "discountGRPC");
+                        policy.RequireClaim("client_id", "testClient", "aspnetRunBasics_client");
+                    });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,7 +63,9 @@ namespace Discount.Grpc
             }
             app.UseHttpsRedirection();
             app.UseRouting();
+            app.UseAuthentication();
 
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGrpcService<DiscountService>();
