@@ -1,4 +1,3 @@
-using Common.Logging;
 using Elastic.Apm.NetCoreAll;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,10 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Polly;
-using Shopping.Aggregator.HttpHandlers;
-using Shopping.Aggregator.Services;
-using System;
+using Shopping.Aggregator.Extensions;
+
 namespace Shopping.Aggregator
 {
     public class Startup
@@ -25,34 +22,10 @@ namespace Shopping.Aggregator
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<LoggingDelegatingHandler>();
-            services.AddTransient<AuthenticationDelegatingHandler>();
+
             services.AddHttpContextAccessor();
 
-            services.AddHttpClient<ICatalogService, CatalogService>(c =>
-                c.BaseAddress = new Uri(Configuration["ApiSettings:CatalogUrl"]))
-                .AddHttpMessageHandler<AuthenticationDelegatingHandler>()
-            .AddHttpMessageHandler<LoggingDelegatingHandler>();
-
-            // .AddPolicyHandler(GetRetryPolicy())
-            //  .AddPolicyHandler(GetCircuitBreakerPolicy());
-
-            services.AddHttpClient<IBasketService, BasketService>(c =>
-                c.BaseAddress = new Uri(Configuration["ApiSettings:BasketUrl"]))
-                .AddHttpMessageHandler<AuthenticationDelegatingHandler>()
-            .AddHttpMessageHandler<LoggingDelegatingHandler>()
-            .AddTransientHttpErrorPolicy(policy => policy.WaitAndRetryAsync(3, _ => TimeSpan.FromSeconds(3)))
-            .AddTransientHttpErrorPolicy(policy => policy.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
-            //.AddPolicyHandler(GetRetryPolicy())
-            //.AddPolicyHandler(GetCircuitBreakerPolicy());
-
-            services.AddHttpClient<IOrderService, OrderService>(c =>
-                c.BaseAddress = new Uri(Configuration["ApiSettings:OrderingUrl"]))
-                .AddHttpMessageHandler<AuthenticationDelegatingHandler>()
-            .AddHttpMessageHandler<LoggingDelegatingHandler>();
-            // .AddPolicyHandler(GetRetryPolicy())
-            // .AddPolicyHandler(GetCircuitBreakerPolicy());
-
+            services.AddHttpClientServices(Configuration);
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -106,6 +79,11 @@ namespace Shopping.Aggregator
             //    .AddUrlGroup(new Uri($"{Configuration["ApiSettings:BasketUrl"]}/swagger/index.html"), "Basket.API", HealthStatus.Degraded)
             //    .AddUrlGroup(new Uri($"{Configuration["ApiSettings:OrderingUrl"]}/swagger/index.html"), "Ordering.API", HealthStatus.Degraded);
         }
+
+
+
+
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
