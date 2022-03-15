@@ -9,7 +9,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using System.Net;
 
 namespace Discount.Grpc
 {
@@ -25,9 +24,7 @@ namespace Discount.Grpc
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12
-                                                   | SecurityProtocolType.Tls11
-                                                   | SecurityProtocolType.Tls13;
+
 
             services.AddScoped<IDiscountRepository, DiscountRepository>();
             services.AddAutoMapper(typeof(Startup));
@@ -61,7 +58,7 @@ namespace Discount.Grpc
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthentication();
 

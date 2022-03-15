@@ -11,7 +11,6 @@ using Microsoft.OpenApi.Models;
 using Ordering.API.EventBusConsumer;
 using Ordering.Application;
 using Ordering.Infrastructure;
-using System.Net;
 
 namespace Ordering.API
 {
@@ -27,9 +26,7 @@ namespace Ordering.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12
-                                                 | SecurityProtocolType.Tls11
-                                                 | SecurityProtocolType.Tls13;
+
             services.AddApplicationServices();
             services.AddInfrastructureServices(Configuration);
 
@@ -116,7 +113,7 @@ namespace Ordering.API
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ordering.API v1"));
             }
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
             app.UseAuthentication();

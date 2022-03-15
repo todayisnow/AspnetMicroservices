@@ -9,7 +9,6 @@ using Microsoft.IdentityModel.Tokens;
 using Ocelot.Cache.CacheManager;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
-using System.Net;
 
 namespace OcelotApiGw
 {
@@ -25,9 +24,9 @@ namespace OcelotApiGw
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12
-                                                 | SecurityProtocolType.Tls11
-                                                 | SecurityProtocolType.Tls13;
+            //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12
+            //                                     | SecurityProtocolType.Tls11
+            //                                     | SecurityProtocolType.Tls13;
             var authenticationProviderKey = "IdentityApiKey";
 
             // NUGET - Microsoft.AspNetCore.Authentication.JwtBearer
@@ -55,7 +54,7 @@ namespace OcelotApiGw
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();

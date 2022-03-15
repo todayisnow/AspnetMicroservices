@@ -7,7 +7,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Net;
 
 namespace AspnetRunBasics
 {
@@ -27,10 +26,7 @@ namespace AspnetRunBasics
 
 
 
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls
-                                       | SecurityProtocolType.Tls11
-                                       | SecurityProtocolType.Tls12
-                                       | SecurityProtocolType.Tls13;
+
 
 
             services.AddHttpClientServices(Configuration);

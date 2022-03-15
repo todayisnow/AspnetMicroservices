@@ -1,10 +1,7 @@
-﻿using AspnetRunBasics.HttpHandlers;
-using IdentityModel;
+﻿using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -21,15 +18,15 @@ namespace AspnetRunBasics.Extensions
         public static IServiceCollection AddIdentityServerServices(this IServiceCollection services, IConfiguration Configuration)
         {
             IdentityModelEventSource.ShowPII = true;
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
-                options.Secure = CookieSecurePolicy.SameAsRequest;
-                options.OnAppendCookie = cookieContext =>
-                    AuthenticationHelpers.CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
-                options.OnDeleteCookie = cookieContext =>
-                    AuthenticationHelpers.CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
-            });
+            //services.Configure<CookiePolicyOptions>(options =>
+            //{
+            //    options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
+            //    options.Secure = CookieSecurePolicy.SameAsRequest;
+            //    options.OnAppendCookie = cookieContext =>
+            //        AuthenticationHelpers.CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
+            //    options.OnDeleteCookie = cookieContext =>
+            //        AuthenticationHelpers.CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
+            //});
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;

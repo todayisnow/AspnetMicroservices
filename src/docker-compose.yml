@@ -113,8 +113,7 @@ networks:
     driver: bridge
   identityserverui:
     driver: bridge
-  ELK:
-     driver: bridge
+
   
   
 

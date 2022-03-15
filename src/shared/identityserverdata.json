@@ -79,6 +79,18 @@
         "Name": "catalogAPI",
         "DisplayName": "catalog API"
       },
+	  {
+        "Name": "discountAPI",
+        "DisplayName": "dicount API"
+      },
+	  {
+        "Name": "dicountGRPC",
+        "DisplayName": "discount GRPC"
+      },
+	  {
+        "Name": "shoppingAgregator",
+        "DisplayName": "shopping Agregator"
+      },
       {
         "Name": "orderAPI",
         "DisplayName": "order API"
@@ -100,7 +112,7 @@
             {
                 "ClientId": "skoruba_identity_admin",
                 "ClientName": "skoruba_identity_admin",
-                "ClientUri": "https://admin.skoruba.local",
+                "ClientUri": "http://admin.skoruba.local",
                 "AllowedGrantTypes": [
                     "authorization_code"
                 ],
@@ -111,14 +123,14 @@
                     }
                 ],
                 "RedirectUris": [
-                    "https://admin.skoruba.local/signin-oidc"
+                    "http://admin.skoruba.local/signin-oidc"
                 ],
-                "FrontChannelLogoutUri": "https://admin.skoruba.local/signout-oidc",
+                "FrontChannelLogoutUri": "http://admin.skoruba.local/signout-oidc",
                 "PostLogoutRedirectUris": [
-                    "https://admin.skoruba.local/signout-callback-oidc"
+                    "http://admin.skoruba.local/signout-callback-oidc"
                 ],
                 "AllowedCorsOrigins": [
-                    "https://admin.skoruba.local"
+                    "http://admin.skoruba.local"
                 ],
                 "AllowedScopes": [
                     "openid",
@@ -136,31 +148,58 @@
                 "RequireClientSecret": false,
                 "RequirePkce": true,
                 "RedirectUris": [
-                    "https://admin-api.skoruba.local/swagger/oauth2-redirect.html"
+                    "http://admin-api.skoruba.local/swagger/oauth2-redirect.html"
                 ],
-"FrontChannelLogoutUri": "https://web.skoruba.local/signout-oidc",
+"FrontChannelLogoutUri": "http://web.skoruba.local/signout-oidc",
                 "AllowedScopes": [
                     "skoruba_identity_admin_api"
                 ],
                 "AllowedCorsOrigins": [
-                    "https://admin-api.skoruba.local"
+                    "http://admin-api.skoruba.local"
                 ]
             },
 			{
+  "ClientId": "testClient",
+  "AllowedGrantTypes": [
+    "clientCredentials"
+  ],
+
+  "ClientSecrets": [
+    {
+      "Value": "secret"
+    }
+  ],
+  "AllowedScopes": [
+    "openid",
+    "profile",
+    "address",
+    "email",
+
+    "basketAPI",
+    "catalogAPI",
+    "orderAPI",
+    "OcelotApiGw",
+	"dicountGRPC",
+	"shoppingAgregator",
+	"discountAPI",
+    "roles"
+  ]
+},
+			{
   "ClientId": "aspnetRunBasics_client",
   "ClientName": "AspnetRun Basics Razor App",
-"ClientUri": "https://web.skoruba.local",
+"ClientUri": "http://web.skoruba.local",
   "AllowedGrantTypes": [
     "hybrid"
   ],
   "RequirePkce": false,
   "AllowRememberConsent": false,
 	"RedirectUris": [
-                    "https://web.skoruba.local/signin-oidc"
+                    "http://web.skoruba.local/signin-oidc"
                 ],
  
   "PostLogoutRedirectUris": [
-    "https://web.skoruba.local/signout-callback-oidc"
+    "http://web.skoruba.local/signout-callback-oidc"
   ],
   "ClientSecrets": [
     {
@@ -177,6 +216,9 @@
     "catalogAPI",
     "orderAPI",
     "OcelotApiGw",
+	"dicountGRPC",
+	"shoppingAgregator",
+	"discountAPI",
     "roles"
   ],
   "AllowOfflineAccess": true,
