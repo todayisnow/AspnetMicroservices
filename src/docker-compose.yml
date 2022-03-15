@@ -2,8 +2,6 @@ version: '3.4'
 
 services:
 
-  nginx-proxy:
-    image: jwilder/nginx-proxy
   identityserver.admin:
     image: ${DOCKER_REGISTRY-}identityserveradmin
     build:
@@ -109,8 +107,7 @@ volumes:
     driver: local
 
 networks:
-  proxy:
-    driver: bridge
+
   identityserverui:
     driver: bridge
 
