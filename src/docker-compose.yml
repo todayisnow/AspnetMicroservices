@@ -12,7 +12,7 @@ services:
     build:
       context: .
       dockerfile: ../../IdentityServer/IdentityServer.Admin.Api/Dockerfile
-  identityserver.sts.identity:
+  IdentityServer:
     image: ${DOCKER_REGISTRY-}identityserverstsidentity
     build:
       context: .
@@ -106,10 +106,6 @@ volumes:
   dbdata:
     driver: local
 
-networks:
-
-  identityserverui:
-    driver: bridge
 
   
   
