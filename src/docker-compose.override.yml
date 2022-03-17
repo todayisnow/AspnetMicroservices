@@ -108,7 +108,7 @@ services:
       - 'ConnectionStrings__DataProtectionDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
       - 'AdminConfiguration__IdentityAdminBaseUrl=http://identityserver.admin'
       - 'AdminConfiguration__IdentityAdminRedirectUri=http://identityserver.admin/signin-oidc'
-      - 'AdminConfiguration__IdentityServerBaseUrl=http://IdentityServer'
+      - 'AdminConfiguration__IdentityServerBaseUrl=http://identityserver'
       - AdminConfiguration__RequirehttpMetadata=false
       - 'IdentityServerData__Clients__0__ClientUri=http://identityserver.admin'
       - 'IdentityServerData__Clients__0__RedirectUris__0=http://identityserver.admin/signin-oidc'
@@ -125,7 +125,7 @@ services:
       - "7001:80"
     depends_on:
       - sqlServer
-      - IdentityServer
+      - identityserver
     volumes:
       - './shared/serilog.json:/app/serilog.json'
       - './shared/identitydata.json:/app/identitydata.json'
@@ -143,7 +143,7 @@ services:
       #- VIRTUAL_PORT=443
       - AdminApiConfiguration__RequirehttpMetadata=false
       - 'AdminApiConfiguration__ApiBaseUrl=http://identityserver.admin.api'
-      - 'AdminApiConfiguration__IdentityServerBaseUrl=http://IdentityServer'
+      - 'AdminApiConfiguration__IdentityServerBaseUrl=http://identityserver'
       - 'ConnectionStrings__ConfigurationDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
       - 'ConnectionStrings__PersistedGrantDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
       - 'ConnectionStrings__IdentityDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
@@ -160,9 +160,9 @@ services:
       
       #https://stackoverflow.com/questions/66205432/redirect-host-inside-docker-compose-network-to-localhost-outside-docker
 
-  IdentityServer:
+  identityserver:
 
-    container_name: IdentityServer
+    container_name: identityserver
     environment:
       #- VIRTUAL_PROTO=http
       #- VIRTUAL_PORT=443      
@@ -172,13 +172,14 @@ services:
       - 'ConnectionStrings__IdentityDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
       - 'ConnectionStrings__DataProtectionDbConnection=Server=sqlServer;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true'
       - 'AdminConfiguration__IdentityAdminBaseUrl=http://identityserver.admin'
-      - 'IdentityServerOptions__IssuerUri=http://IdentityServer'
-      - IdentityServerOptions__Events__RaiseErrorEvents=true
-      - IdentityServerOptions__Events__RaiseInformationEvents=true
-      - IdentityServerOptions__Events__RaiseFailureEvents=true
-      - IdentityServerOptions__Events__RaiseSuccessEvents=true
+      - 'IdentityServerOptions__IssuerUri=http://identityserver'
+      - identityserverOptions__Events__RaiseErrorEvents=true
+      - identityserverOptions__Events__RaiseInformationEvents=true
+      - identityserverOptions__Events__RaiseFailureEvents=true
+      - identityserverOptions__Events__RaiseSuccessEvents=true
       - "ElasticConfiguration__Uri=http://elasticsearch:9200"
       - "ElasticApm__ServerUrl=http://apmServer:8200"
+      
       
 
       - ASPNETCORE_ENVIRONMENT=Development
@@ -202,12 +203,12 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - "DatabaseSettings:ConnectionString=mongodb://catalogdb:27017"
-      - "IdentityServer:Uri=http://IdentityServer"
+      - "IdentityServer:Uri=http://identityserver"
       - "ElasticConfiguration__Uri=http://elasticsearch:9200"
       - "ElasticApm__ServerUrl=http://apmServer:8200"
     depends_on:
       - catalogdb
-      - IdentityServer
+      - identityserver
       - apm-server
       - elasticsearch    
     ports:
@@ -223,7 +224,7 @@ services:
       
       - "GrpcSettings:DiscountUrl=http://discount.grpc"
       - "EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672"
-      - "IdentityServer:Uri=http://IdentityServer"
+      - "IdentityServer:Uri=http://identityserver"
       - "ElasticConfiguration__Uri=http://elasticsearch:9200"
       - "ElasticApm__ServerUrl=http://apmServer:8200"
 
@@ -233,7 +234,7 @@ services:
     depends_on:
       - basketdb
       - rabbitmq
-      - IdentityServer
+      - identityserver
       - apm-server
       - elasticsearch
    
@@ -245,7 +246,7 @@ services:
     container_name: discount.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - "IdentityServer:Uri=http://IdentityServer"
+      - "IdentityServer:Uri=http://identityserver"
       - "ElasticConfiguration__Uri=http://elasticsearch:9200"
       - "ElasticApm__ServerUrl=http://apmServer:8200"      
       - "DatabaseSettings:ConnectionString=Server=discountdb;Port=5432;Database=DiscountDb;User Id=admin;Password=admin1234;"
@@ -253,7 +254,7 @@ services:
         - discountdb
         - apm-server
         - elasticsearch
-        - IdentityServer
+        - identityserver
     ports:
       - "8002:80"        
      
@@ -264,7 +265,7 @@ services:
     container_name: discount.grpc
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - "IdentityServer:Uri=http://IdentityServer"
+      - "IdentityServer:Uri=http://identityserver"
       - "ElasticConfiguration__Uri=http://elasticsearch:9200"
       - "ElasticApm__ServerUrl=http://apmServer:8200"      
       - "DatabaseSettings:ConnectionString=Server=discountdb;Port=5432;Database=DiscountDb;User Id=admin;Password=admin1234;"
@@ -272,7 +273,7 @@ services:
         - discountdb
         - apm-server
         - elasticsearch    
-        - IdentityServer
+        - identityserver
     ports:
       - "8003:80"          
      
@@ -285,7 +286,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - "ConnectionStrings:OrderingConnectionString=Server=sqlServer;Database=orderdb;User Id=sa;Password=${DB_PASSWORD:-Password_123}"
       - "EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672"
-      - "IdentityServer:Uri=http://IdentityServer"
+      - "IdentityServer:Uri=http://identityserver"
       
       - "ElasticConfiguration__Uri=http://elasticsearch:9200"
       - "ElasticApm__ServerUrl=http://apmServer:8200"
@@ -294,7 +295,7 @@ services:
     depends_on:
       - sqlServer
       - rabbitmq
-      - IdentityServer
+      - identityserver
 
       - apm-server
       - elasticsearch
@@ -306,7 +307,7 @@ services:
     container_name: ocelotapigw
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - "IdentityServer:Uri=http://IdentityServer"
+      - "IdentityServer:Uri=http://identityserver"
       - "ElasticConfiguration__Uri=http://elasticsearch:9200"
       - "ElasticApm__ServerUrl=http://apmServer:8200"      
     depends_on:
@@ -314,7 +315,7 @@ services:
         - basket.api
         - discount.api
         - ordering.api
-        - IdentityServer
+        - identityserver
         - apm-server
         - elasticsearch  
     ports:
@@ -329,7 +330,7 @@ services:
         - "ApiSettings:CatalogUrl=http://catalog.api"
         - "ApiSettings:BasketUrl=http://basket.api"
         - "ApiSettings:OrderingUrl=http://ordering.api"
-        - "IdentityServer:Uri=http://IdentityServer"
+        - "IdentityServer:Uri=http://identityserver"
         - "ElasticConfiguration__Uri=http://elasticsearch:9200"
         - "ElasticApm__ServerUrl=http://apmServer:8200"        
     ports:
@@ -338,7 +339,7 @@ services:
         - catalog.api
         - basket.api
         - ordering.api
-        - IdentityServer
+        - identityserver
         - apm-server
         - elasticsearch   
      
@@ -351,7 +352,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
       - "ApiSettings__GatewayAddress=http://ocelotapigw"
-      - "IdentityServer__Uri=http://IdentityServer"
+      - "IdentityServer__Uri=http://identityserver"
       - "IdentityServer__RedirectUri=http://aspnetrunbasics/signin-oidc"
       - "ElasticConfiguration__Uri=http://elasticsearch:9200"
       - "ElasticApm__ServerUrl=http://apmServer:8200"      
@@ -366,7 +367,7 @@ services:
         - basket.api
         - discount.api
         - ordering.api
-        - IdentityServer
+        - identityserver
         - apm-server
         - elasticsearch
        

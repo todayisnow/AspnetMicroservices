@@ -12,7 +12,7 @@ services:
     build:
       context: .
       dockerfile: ../../IdentityServer/IdentityServer.Admin.Api/Dockerfile
-  IdentityServer:
+  identityserver:
     image: ${DOCKER_REGISTRY-}identityserverstsidentity
     build:
       context: .

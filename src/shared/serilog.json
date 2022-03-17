@@ -2,10 +2,11 @@
   "Serilog": {
     "Using": [ "Serilog.Sinks.Console" ],
     "MinimumLevel": {
-      "Default": "Debug",
+      "Default": "Information",
       "Override": {
         "Microsoft": "Information",
-        "System": "Error"
+        "System": "Error",
+	"ElasticApm": "Information"
       }
     },
     "WriteTo": [
