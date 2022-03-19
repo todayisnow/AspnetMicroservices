@@ -88,7 +88,7 @@ namespace AspnetRunBasics.Extensions
                     sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
                     onRetry: (exception, retryCount, context) =>
                     {
-                        Log.Error($"Retry {retryCount} of {context.PolicyKey} at {context.OperationKey}, due to: {exception.Exception.Message}.");
+                        Log.Error($"Retry {retryCount} of {context.PolicyKey} at {context.OperationKey}, due to: {exception.Result.ReasonPhrase}.");
                     });
         }
 
@@ -103,7 +103,7 @@ namespace AspnetRunBasics.Extensions
                     {
 
                         Log.Error(".Breaker logging: Breaking the circuit for "
-                            + breakDelay.TotalMilliseconds + "ms! ..due to: " + ex.Exception.Message);
+                            + breakDelay.TotalMilliseconds + "ms! ..due to: " + ex.Result.ReasonPhrase);
                     },
                     onReset: () => Log.Warning(".Breaker logging: Call ok! Closed the circuit again!"),
                     onHalfOpen: () => Log.Warning(".Breaker logging: Half-open: Next call is a trial!")
